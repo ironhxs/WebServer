@@ -1,0 +1,153 @@
+.TH WEBSERVER 1 "2026-01-10" "WebServer 1.0.0" "User Commands"
+.SH NAME
+webserver \- high-performance C++ web server with epoll and thread pool
+.SH SYNOPSIS
+.B webserver
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+.B webserver
+is a high-performance web server implemented in C++11, featuring:
+.IP \[bu] 2
+Epoll-based I/O multiplexing (supports 10000+ concurrent connections)
+.IP \[bu]
+Thread pool for concurrent request processing
+.IP \[bu]
+MySQL connection pool for database operations
+.IP \[bu]
+Asynchronous logging system
+.IP \[bu]
+Automatic timeout connection cleanup
+.IP \[bu]
+HTTP/1.1 protocol support with Keep-Alive
+.SH OPTIONS
+.TP
+.BR \-p ", " \-\-port " \fIPORT\fR"
+Listening port number (default: 9006)
+.TP
+.BR \-l ", " \-\-log\-mode " \fIMODE\fR"
+Logging mode: 0=synchronous, 1=asynchronous (default: 0)
+.TP
+.BR \-m ", " \-\-trigger\-mode " \fIMODE\fR"
+Epoll trigger mode combination:
+.RS
+.IP "0" 4
+LT (listenfd) + LT (connfd)
+.IP "1"
+LT (listenfd) + ET (connfd)
+.IP "2"
+ET (listenfd) + LT (connfd)
+.IP "3"
+ET (listenfd) + ET (connfd) - highest performance
+.RE
+.TP
+.BR \-o ", " \-\-opt\-linger " \fIFLAG\fR"
+Enable SO_LINGER graceful shutdown: 0=disabled, 1=enabled (default: 0)
+.TP
+.BR \-s ", " \-\-sql\-pool " \fINUM\fR"
+Database connection pool size (default: 8)
+.TP
+.BR \-t ", " \-\-threads " \fINUM\fR"
+Thread pool size (default: 8, recommended: CPU cores * 2)
+.TP
+.BR \-c ", " \-\-close\-log " \fIFLAG\fR"
+Disable logging: 0=enabled, 1=disabled (default: 0)
+.TP
+.BR \-a ", " \-\-actor\-model " \fIMODEL\fR"
+Concurrency model: 0=Proactor, 1=Reactor (default: 0)
+.TP
+.BR \-h ", " \-\-help
+Display help message and exit
+.SH EXAMPLES
+.TP
+Start server on port 8080 with default settings:
+.B webserver \-p 8080
+.TP
+High-performance configuration (async log, ET mode, 16 threads):
+.B webserver \-p 9006 \-l 1 \-m 3 \-t 16 \-a 0
+.TP
+Development mode with detailed logging:
+.B webserver \-p 8080 \-l 0 \-c 0
+.SH FILES
+.TP
+.I /etc/webserver/server.conf
+System-wide configuration file (if exists)
+.TP
+.I ~/webserver/config/server.conf
+User configuration file
+.TP
+.I *.log, *ServerLog
+Log files generated in working directory
+.SH DATABASE
+The server requires MySQL 8.0+ with the following default configuration:
+.PP
+.RS 4
+.nf
+Database: xhrdb
+Username: root
+Password: (set in source code)
+.fi
+.RE
+.PP
+Initialize database:
+.RS 4
+.B mysql \-u root \-p < config/setup_db.sql
+.RE
+.SH PERFORMANCE
+.TP
+.B Benchmark with webbench:
+webbench \-c 10000 \-t 10 http://localhost:9006/
+.PP
+Typical performance:
+.RS 4
+.IP \[bu] 2
+Concurrent connections: 10000+
+.IP \[bu]
+QPS: ~50000 requests/second
+.IP \[bu]
+Memory usage: ~270MB (with connection pool)
+.RE
+.SH ARCHITECTURE
+.TP
+.B Reactor Mode (actor-model=1)
+Main thread monitors events, worker threads handle I/O and business logic.
+Best for high-concurrency short connections.
+.TP
+.B Proactor Mode (actor-model=0)
+Main thread handles I/O, worker threads process business logic only.
+Best for I/O-intensive applications.
+.SH SIGNALS
+.TP
+.B SIGTERM, SIGINT
+Gracefully shutdown server
+.TP
+.B SIGALRM
+Internal timer signal for connection timeout management
+.SH EXIT STATUS
+.TP
+.B 0
+Success
+.TP
+.B 1
+Socket creation or binding failed
+.TP
+.B 2
+Database connection failed
+.TP
+.B 3
+Resource initialization failed
+.SH BUGS
+Report bugs to: https://github.com/your-repo/WebServer/issues
+.SH AUTHOR
+Written by WebServer Development Team
+.SH COPYRIGHT
+Copyright \(co 2026 WebServer Project
+.br
+License: MIT License
+.SH SEE ALSO
+.BR nginx (8),
+.BR apache2 (8),
+.BR webbench (1)
+.PP
+Full documentation: <file:///usr/share/doc/webserver/README.md>
+.br
+Online: <https://github.com/your-repo/WebServer/docs>

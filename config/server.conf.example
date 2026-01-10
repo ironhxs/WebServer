@@ -1,0 +1,125 @@
+# ==============================================================================
+# Web Server Configuration File
+# ==============================================================================
+# 
+# 使用方法：
+# 1. 复制此文件为 server.conf
+# 2. 修改配置参数
+# 3. 程序自动读取（未来版本支持）
+#
+# 当前版本：通过命令行参数配置
+# 示例：./server -p 9006 -l 1 -m 3 -t 16
+# ==============================================================================
+
+[server]
+# 服务器监听端口
+# 范围：1-65535，建议1024以上
+# 生产环境建议：80 (HTTP) 或 443 (HTTPS)
+port = 9006
+
+# 网站根目录（相对于可执行文件）
+root_directory = ./root
+
+[database]
+# MySQL数据库配置
+host = localhost
+port = 3306
+user = root
+password = 
+database = xhrdb
+
+# 连接池大小
+# 建议：与线程池大小相同
+connection_pool_size = 8
+
+[threadpool]
+# 工作线程数量
+# 建议：CPU核心数 * 2
+# 开发环境：4-8
+# 生产环境：16-32
+thread_count = 8
+
+[log]
+# 日志模式
+# 0 = 同步日志（安全，性能略低）
+# 1 = 异步日志（高性能，推荐）
+async_mode = 1
+
+# 是否关闭日志
+# 0 = 开启（推荐）
+# 1 = 关闭（可提升5-10%性能，但不利于调试）
+disable_log = 0
+
+# 日志文件路径
+log_path = ./ServerLog
+
+# 日志级别
+# 0 = DEBUG, 1 = INFO, 2 = WARN, 3 = ERROR
+log_level = 1
+
+[network]
+# Epoll触发模式
+# 0 = LT+LT（开发推荐）
+# 1 = LT+ET（平衡模式）
+# 2 = ET+LT（较少使用）
+# 3 = ET+ET（高性能模式）
+trigger_mode = 1
+
+# 优雅关闭连接
+# 0 = 立即关闭
+# 1 = 等待数据发送完（推荐）
+linger_mode = 1
+
+# 并发模型
+# 0 = Proactor模式
+# 1 = Reactor模式
+actor_model = 0
+
+[performance]
+# 最大文件描述符数（需要系统支持）
+max_fd = 65536
+
+# Epoll最大事件数
+max_events = 10000
+
+# 连接超时时间（秒）
+timeout = 5
+
+# 最大请求队列长度
+max_request_queue = 10000
+
+[security]
+# 是否启用IP黑名单（未来功能）
+enable_blacklist = false
+
+# 是否启用请求频率限制（未来功能）
+enable_rate_limit = false
+
+# 最大请求大小（字节）
+max_request_size = 1048576
+
+# ==============================================================================
+# 配置说明
+# ==============================================================================
+#
+# 开发环境配置：
+# - port = 9006
+# - thread_count = 4
+# - async_mode = 0
+# - trigger_mode = 0
+# - disable_log = 0
+#
+# 生产环境配置：
+# - port = 80
+# - thread_count = 32
+# - async_mode = 1
+# - trigger_mode = 3
+# - disable_log = 0
+#
+# 压力测试配置：
+# - thread_count = CPU核心数 * 2
+# - async_mode = 1
+# - trigger_mode = 3
+# - disable_log = 1
+#
+# ==============================================================================

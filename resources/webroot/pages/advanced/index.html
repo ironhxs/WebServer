@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>网络安全介绍网</title>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" href="/assets/css/vendor.css">
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/Swiper/9.4.1/swiper-bundle.min.css" />
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/assets/css/advanced-style.css">
+
+  <!-- Google Fonts ================================================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500&family=Raleway:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+
+
+  <!-- script ================================================== -->
+</head>
+
+<body data-bs-spy="scroll" data-bs-target="#header-nav" tabindex="0">
+
+  <!-- scroll-top section -->
+  <div id="scroll-top-btn" class="bg-white rounded-pill text-primary position-fixed">
+    <iconify-icon icon="ph:arrow-up-light" class="scroll-icon p-2 pb-0"></iconify-icon>
+  </div>
+
+  <!-- Nav Section Starts -->
+  <header id="navigation">
+    <nav class="navbar navbar-expand-lg position-absolute px-0 px-md-4 py-4 ">
+
+      <div class="container-fluid">
+
+        <a class="navbar-brand" href=""><img src="./html/images/D77E7C834290AA495C62BC9D3D976ED0.png" alt=""></a>
+
+        <button class="navbar-toggler text-white shadow-none" type="button" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+          <span>
+            <iconify-icon icon="quill:hamburger" class="navbar-icon"></iconify-icon>
+          </span>
+        </button>
+
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+
+          <div class="offcanvas-body">
+            <ul class="navbar-nav container align-items-center px-5 nav-list1">
+              <li class="nav-item">
+                <a class="nav-link text-uppercase px-4 text-light"  id="networkSecurityTop" href=""style="font-size: 30px;">网络安全 </a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link text-uppercase px-4 text-light text-center dropdown-toggle" id="ThreatsAndAttacksTop" data-bs-toggle="dropdown"
+                  href="" role="button" style="font-size: 30px;">威胁与攻击</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link text-uppercase px-4 text-light text-center dropdown-toggle" data-bs-toggle="dropdown"
+                  href="#" role="button" aria-expanded="false"style="font-size: 30px;"id="SolutionTop">解决方案</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-uppercase px-4 text-light" id="DataProtectionAndPrivacyTop" style="font-size: 30px;">数据保护与隐私 </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-uppercase px-4 text-light" id="commonProblemTop" style="font-size: 30px;">常见问题 </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section Starts -->
+  <section id="hero">
+    <!-- <div class="image-holder position-relative" id="networkSecurityResponse">
+      <img src="./html/images/pattern.png" alt="banner" class="img-fluid">
+    </div> -->
+    <div class="hero container position-absolute  top-50 start-50 translate-middle pb-5 " data-aos="fade-up"
+      data-aos-easing="ease-in-sine">
+      <div class="row align-items-center g-5 py-5">
+        <div class=" col-lg-6">
+          <h6>concept</h6>
+          <h1 class=" text-capitalize text-light my-3">保护网络系统不受威胁和侵害，确保其正常稳定运行</h1>
+          <p class="text-light mb-4">Protect network systems from threats and violations to ensure their normal and stable operation </p>
+
+          <div class="">
+
+            <button type="button" class="btn btn-primary me-3 mb-2">
+              <a href="https://www.cac.gov.cn/index.htm">国家官网
+                <span class="btnTwo">
+                  <iconify-icon icon="prime:arrow-right" class="btn-arrow"></iconify-icon>
+                </span></a>
+            </button>
+
+            <button type="button" class="btn btn-outline-primary hero-btn-outline-primary mb-2"> <a href="https://www.mbu.cn/upload/file/20240104/6383999004210290544025468.pdf">相关法律学习 </a></button>
+          </div>
+        </div>
+        <div class="col-10 col-sm-8 col-lg-6">
+          <img src="./html/images/hero.png" class=" d-none d-lg-block img-fluid" alt="Bootstrap Themes" loading="lazy">
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- brand section starts  -->
+  <section id="brands" class="container-fluid brand-block ">
+    <div class=" brand-names d-lg-flex justify-content-between "id="ThreatsAndAttacksResponse">
+      <img class=" mb-5 mb-lg-0 me-4 " src="./html/images/threat1.png" alt="" onclick="redirectToPage1()">
+      <img class=" mb-5 mb-lg-0 me-4 " src="./html/images/threat2.png" alt=""  onclick="redirectToPage2()">
+      <img class=" mb-5 mb-lg-0 me-4 " src="./html/images/threat3.png" alt=""  onclick="redirectToPage3()">
+      <img class=" mb-5 mb-lg-0 me-4 " src="./html/images/threat4.png" alt=""  onclick="redirectToPage4()">
+    </div>
+  </section>
+
+  <!-- steps section starts  -->
+  <section id="steps">
+    <div id="SolutionResponse" class="container my-5 pt-5" data-aos="fade-up" data-aos-easing="ease-in-sine">
+      <h2 class="text-capitalize text-center mt-5 ">Six solutions</h2>
+      <div class="row py-4">
+        <div class="col-md-4 mt-4">
+          <div class="step-post text-center  px-5">
+            <div class="step-icon mb-3">
+              <!-- <iconify-icon class="iconify-step" style="background: #5399F4 ;"
+                icon="mdi:download-circle-outline"></iconify-icon> -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 64 64">
+                  <circle cx="32" cy="32" r="30" fill="#4fd1d9" />
+                  <path fill="#fff" d="M38 48h-6.1V25c-2.2 2.1-4.9 3.6-7.9 4.6v-5.5c1.6-.5 3.3-1.5 5.2-3c1.9-1.5 3.2-3.2 3.8-5.1h5z" />
+                </svg>
+            </div>
+            <h3 class=" ">智能分析</h3>
+            <p class=" ">利用人工智能技术，如机器学习和数据分析，对网络活动进行监控和分析，以预测和识别潜在的安全威胁。通过云地联邦学习，实现威胁模型的自我进化，提高威胁检测的准确率，通常能够达到96%以上。</p>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="step-post text-center  px-5">
+            <div class="step-icon mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 24 24">
+                <g fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                  <path d="M9.5 10.337c0-3.116 4.615-3.116 4.615 0c0 2.352-3.015 4.38-4.615 5.663c0 0 3-.5 5 0" />
+                  <path d="M20.5 15.8V8.2a1.91 1.91 0 0 0-.944-1.645l-6.612-3.8a1.88 1.88 0 0 0-1.888 0l-6.612 3.8A1.895 1.895 0 0 0 3.5 8.2v7.602a1.91 1.91 0 0 0 .944 1.644l6.612 3.8a1.88 1.88 0 0 0 1.888 0l6.612-3.8A1.895 1.895 0 0 0 20.5 15.8" />
+                </g>
+              </svg>
+            </div>
+            <h3 class=" ">动态检测</h3>
+            <p class=" ">实时监控网络流量和用户行为，利用智能图谱关联分析技术，快速准确地识别异常模式和可疑活动。动态检测能够提供实时、动态的威胁感知能力，使得安全事件能够在发生之前被及时发现并得到响应。</p>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="step-post text-center  px-5">
+            <div class="step-icon mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 24 24">
+                <path fill="#dad307" d="m12 3l10 9h-3v8H5v-8H2zm3 8.5V10a2 2 0 0 0-2-2H9v2h4v2h-2v2h2v2H9v2h4a2 2 0 0 0 2-2v-1.5a1.5 1.5 0 0 0-1.5-1.5a1.5 1.5 0 0 0 1.5-1.5" />
+              </svg>
+            </div>
+            <h3 class=" ">全局防御</h3>
+            <p class=" ">构建一个全面的防御体系，从网络的边缘到核心，从物理设备到虚拟环境，实现全方位全方面的保护。通过“云网安”协同，实现威胁的秒级处置，确保网络安全事件能够得到迅速有效的控制和处理。</p>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="step-post text-center  px-5">
+            <div class="step-icon mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 128 128">
+                <path fill="#757f3f" d="M108.17 116.39c-9.15-2.68-16.68-8.59-22.04-16.39c-1.48-2.14-4.19-7.4-7.47-5.66c-4.17 2.22-1.88 8.77-.5 11.94c2.27 5.23 6.07 10.23 10.75 14.07c5.31 4.37 11.79 7.26 18.49 7.33c3.43.04 6.03-2.79 6-6.13c-.02-3.24-2.52-4.36-5.23-5.16M68.88 63.53c-1.09-2.62-1.84-5.93-3.87-8.02c-1.66-1.7-10.24.33-12.44.65c-9.56 1.37-19.2 5.23-26.08 12.2c-5.65 5.71-8.95 15.56-5.27 23.14c1.16 2.4 3 4.39 5.22 5.85c3.59 2.36 7.89.91 11.58 2.55c2.4 1.06 3.3 3.83 5.43 5.24c3.12 2.08 6.88 3.04 10.62 2.89c.43-.01.87-.04 1.29-.09c6.47-.66 13.83-6.33 16.61-12.01c3.17-6.49 2.76-14.21.97-21.03c-1.03-3.92-2.5-7.64-4.06-11.37m50.46-4.9c-4.93-13.56-21.6-14.12-33.63-12.06c-3.88.66-9.18 1.78-12.5 3.94c-.43.28-1.1.73-1.39 1.14c-.34.46-.32.77-.16 1.11c2.47 5.43 4.55 11.04 6.28 16.75c1.63 5.42 2.47 11.32 5.08 16.39c3.59 7.01 8.62 9.62 16.3 10.47c2.82.31 5.56-.79 7.74-2.43c3.19-2.38 5.85-5.27 6.83-9.24c.43-1.76.44-3.43.44-5.28c0-2.07-1.11-4.33 1.1-5.66c5.64-3.38 5.93-9.57 3.91-15.13m-64.39-8.17c2.02-.57 4.08-.91 6.12-1.19c2.36-.33.21-6.55-.12-7.65c-3.57-11.97-8.31-27.11-22.32-30c-5.99-1.24-15.13 1.46-17.6 7.53c-.91 2.24-.61 4.49-.96 6.81C12.16 28.98 5.5 38.02 8.08 46.51c1.98 6.5 8.32 9.85 14.91 10.12c11.39.47 21.22-3.15 31.96-6.17m14.17-4.01c3.79-.25 7.55-2.25 11.17-3.28c8.04-2.31 17.01-2.1 24.31-6.62c1.87-1.15 2.91-3.33 3.7-5.32c1.96-4.89 2.42-11.11-.79-15.58c-3.66-5.08-12.25-6.54-18.07-5.14c-1.11.27-1.92.18-2.36-.94c-.91-2.24-2.29-4.17-3.98-5.67C79.61.82 74.8-.5 70 .85c-3.83 1.07-6.82 3.9-8.49 7.45c-5.02 10.7.51 26.01 5.36 35.95c.46.95 1.12 2.28 2.25 2.2" />
+              </svg>
+            </div>
+            <h3 class=" ">内生可信</h3>
+            <p class=" ">确保网络系统的内在安全性，包括硬件和软件的安全性，以及数据传输和存储的安全性。通过建立可信的基础设施、网络和身份，形成一个安全的网络环境，从而减少外部威胁的侵入可能性。</p>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="step-post text-center  px-5">
+            <div class="step-icon mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 24 24">
+                <path fill="#489e29" d="M17 13v-2a2 2 0 0 0-2-2h-2V7h4V5h-6v6h4v2h-4v2h4a2 2 0 0 0 2-2M3 5H1v16a2 2 0 0 0 2 2h16v-2H3m18-4H7V3h14m0-2H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2" />
+              </svg>
+            </div>
+            <h3 class=" ">AI安全智能体</h3>
+            <p class=" ">华为提出了业界首个L4级AI安全智能体，这为人工智能时代的全球网络安全防御提供了新的思路和方向。AI安全智能体能够自动识别和响应各种安全事件，提高了网络安全防御的效率和准确性。</p>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="step-post text-center  px-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 512 512">
+              <path fill="#ce470d" d="M74.5 36A38.5 38.5 0 0 0 36 74.5v363A38.5 38.5 0 0 0 74.5 476h363a38.5 38.5 0 0 0 38.5-38.5v-363A38.5 38.5 0 0 0 437.5 36zm48.97 36.03A50 50 0 0 1 172 122a50 50 0 0 1-100 0a50 50 0 0 1 51.47-49.97m268 0A50 50 0 0 1 440 122a50 50 0 0 1-100 0a50 50 0 0 1 51.47-49.97M122 206a50 50 0 0 1 0 100a50 50 0 0 1 0-100m268 0a50 50 0 0 1 0 100a50 50 0 0 1 0-100M123.47 340.03A50 50 0 0 1 172 390a50 50 0 0 1-100 0a50 50 0 0 1 51.47-49.97m268 0A50 50 0 0 1 440 390a50 50 0 0 1-100 0a50 50 0 0 1 51.47-49.97" />
+            </svg>
+            <h3 class=" ">场景化解决方案</h3>
+            <p class=" ">针对不同的网络环境和业务需求，如分支园区、办公园区、生产园区、广域网、等级保护、数据中心等，提供定制化的安全防护体验。场景化解决方案能够根据不同的应用场景和风险状况，提供个性化的安全策略和措施，确保各类网络环境的安全。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- about section starts  -->
+  <section id="about">
+    <div class="hero container my-5">
+      <div class="row  align-items-center g-5 py-5">
+        <div class="  col-10 col-sm-8 col-lg-6">
+          <img src="./html/images/about.png" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" loading="lazy">
+        </div>
+        <div class=" col-lg-6" data-aos="fade-up" data-aos-easing="ease-in-sine">
+          <h6>Meaning</h6>
+          <h2 class=" text-capitalize  my-3">The significance of the solution</h2>
+          <p class="pb-5">这些网络安全解决方案的意义在于提升网络环境的防护能力，确保信息安全和业务连续性，同时通过智能化和定制化的保护措施，应对不断变化的安全威胁，减少潜在的风险和损害。 </p>
+
+          <div class="">
+            <button type="button" class="btn btn-outline-primary"><a href="https://s.tencent.com/">腾讯安全</a></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+  <!-- about2 section starts  -->
+  <section id="about2"style="background-color:#f2f6fb;">
+    <div id="DataProtectionAndPrivacyResponse" class="hero container  py-5 my-5">
+      <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+        <div class="  col-10 col-sm-8 col-lg-6">
+          <img src="./html/images/about2.png" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" loading="lazy">
+        </div>
+        <div class=" col-lg-6" data-aos="fade-up" data-aos-easing="ease-in-sine">
+          <h6>Definition</h6>
+          <h2 class=" text-capitalize  my-3">数据保护与隐私</h2>
+          <p class="mb-5">数据保护与隐私是维护个人信息安全和尊严的核心原则，涉及一系列法律、政策和技术措施，旨在保障个人对其数据的控制，并防止未授权存取、泄露或滥用。在数字时代，随着个人信息的收集和处理日益增多，保障数据隐私尤为重要，需要个人、企业和政府共同努力，遵循相关法规如GDPR，采用加密、访问控制等技术手段以确保数据的安全和隐私得到妥善保护。 </p>
+
+          <div class="">
+            <button type="button" class="btn btn-outline-primary"><a href="https://www.nprc.org.cn/file_path/8104239e299443eea25ab77f5dc02e11.pdf">相关法律学习</a></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+  <!-- feature section starts  -->
+  <section id="feature" style="background-color: #ffffff;">
+    <div class="container py-5">
+      <h2 class="text-capitalize text-center pt-5 pb-3 my-5">Data protection and privacy</h2>
+      <div class="row row-cols-2 row-cols-sm-3 pb-5 " data-aos="fade-up" data-aos-easing="ease-in-sine">
+        <div class="col align-items-start pb-4">
+          <iconify-icon class="feature-icon" icon="mdi:cellphone-cog"></iconify-icon>
+          <div>
+            <h3 class="">数据的安全性</h3>
+            <p class="">确保数据在存储、传输和处理过程中不被未经授权的人访问、修改、删除或泄露。这涉及到使用加密技术、防火墙、入侵检测系统等安全措施来防止数据被恶意攻击或不当访问。
+            </p>
+          </div>
+        </div>
+        <div class="col align-items-start pb-4">
+          <iconify-icon class="feature-icon" icon="mdi:nas"></iconify-icon>
+          <div>
+            <h3 class="">数据的完整性</h3>
+            <p>保护数据不被非法篡改，确保数据的准确性和一致性。这意味着需要有机制来验证数据在传输或存储过程中是否被更改，以及确保数据恢复时能够保持其原始状态。
+            </p>
+          </div>
+        </div>
+        <div class="col align-items-start pb-4">
+          <iconify-icon class="feature-icon" icon="mdi:lock-check"></iconify-icon>
+          <div>
+            <h3 class="">数据的隐私性</h3>
+            <p>关注个人敏感信息的保护，包括身份信息、通信记录、健康数据等。数据隐私的目的是保护个人敏感信息不被滥用或非法披露，这通常涉及到遵守相关的隐私法规，如《中华人民共和国个人信息保护法（草案）》等。
+            </p>
+          </div>
+        </div>
+        <div class="col align-items-start pb-4">
+          <iconify-icon class="feature-icon" icon="mdi:database"></iconify-icon>
+          <div>
+            <h3 class="">法律遵从性</h3>
+            <p>采用数字水印、数据脱敏等技术手段来保护数据隐私。数字水印用于版权信息识别，而数据脱敏则是对敏感数据进行技术上的变形处理，以在不泄露个人信息的前提下使用数据。
+            </p>
+          </div>
+        </div>
+        <div class="col align-items-start pb-4">
+          <iconify-icon class="feature-icon" icon="mdi:server-security"></iconify-icon>
+          <div>
+            <h3 class="">政策与管理</h3>
+            <p>建立有效的数据保护政策和管理体系，包括数据分类、权限控制、员工培训等，以确保所有涉及数据处理的活动都符合组织的数据保护标准和政策。
+            </p>
+          </div>
+        </div>
+        <div class="col align-items-start pb-4">
+          <iconify-icon class="feature-icon" icon="mdi:comment-question"></iconify-icon>
+          <div>
+            <h3 class="">技术措施</h3>
+            <p>采用数字水印、数据脱敏等技术手段来保护数据隐私。数字水印用于版权信息识别，而数据脱敏则是对敏感数据进行技术上的变形处理，以在不泄露个人信息的前提下使用数据。
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+
+
+
+
+  <!-- FAQ Section Starts -->
+  <section id="faq"style="background-color:#f2f6fb">
+
+    <div id="commonProblemResponse" class="container my-5 py-5 ">
+      <h2 class="text-center  mb-5">Frequently Asked Questions and Answers</h2>
+
+
+      <div class="accordion col-md-10 offset-md-1" id="accordionPanelsStayOpenExample">
+
+        <div class="accordion-item mt-3" data-aos="fade-up" data-aos-easing="ease-in-sine" data-aos-delay="200">
+          <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false"
+              aria-controls="panelsStayOpen-collapseOne">
+              什么是恶意软件，它包括哪些类型？
+            </button>
+          </h2>
+          <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse"
+            aria-labelledby="panelsStayOpen-headingOne">
+            <div class="accordion-body">
+              <p>恶意软件是一种广义术语，指的是损害或破坏计算机系统功能的任何类型的文件或程序。常见的恶意软件类型包括勒索软件、僵尸网络软件、间谍软件、木马、病毒和蠕虫等。它们可能会为黑客提供未经授权的访问权限，从而对计算机造成损害。</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item mt-3" data-aos="fade-up" data-aos-easing="ease-in-sine" data-aos-delay="200">
+          <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
+              aria-controls="panelsStayOpen-collapseTwo">
+              如何保护数据不被泄露？
+            </button>
+          </h2>
+          <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse"
+            aria-labelledby="panelsStayOpen-headingTwo">
+            <div class="accordion-body">
+              <p>保护数据的措施包括使用数据丢失防护软件、实施强密码政策、进行员工安全意识培训、启用双因素认证、使用虚拟专用网络（VPN）、监控物理设备的使用、定期审查IT基础架构以及更新网络安全策略等方法。此外，加密技术也是防止数据泄露的重要手段。</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item mt-3" data-aos="fade-up" data-aos-easing="ease-in-sine" data-aos-delay="400">
+          <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
+              aria-controls="panelsStayOpen-collapseThree">
+              威胁、脆弱性和风险有何不同？
+            </button>
+          </h2>
+          <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse"
+            aria-labelledby="panelsStayOpen-headingThree">
+            <div class="accordion-body">
+              <p>脆弱性是系统或应用程序中存在的漏洞，可以被威胁利用来未授权访问公司资产。威胁是指任何可能有意或无意利用这些漏洞来损害或破坏资产的实体。而风险则是指威胁利用脆弱性造成损失或破坏的潜在可能性。</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item mt-3" data-aos="fade-up" data-aos-easing="ease-in-sine" data-aos-delay="600">
+          <h2 class="accordion-header" id="panelsStayOpen-headingFour">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false"
+              aria-controls="panelsStayOpen-collapseFour">
+              如果发生数据泄露，应该如何应对？
+            </button>
+          </h2>
+          <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse"
+            aria-labelledby="panelsStayOpen-headingFour">
+            <div class="accordion-body">
+              <p>如果发生数据泄露，应立即采取行动以减轻损害。这包括隔离和限制对泄露数据的访问，评估泄露的影响，通知受影响的个人和监管机构，以及采取措施修复导致泄露的安全漏洞。同时，应制定危机管理计划，以便在未来的数据泄露事件中迅速响应。</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item mt-3" data-aos="fade-up" data-aos-easing="ease-in-sine" data-aos-delay="800">
+          <h2 class="accordion-header" id="panelsStayOpen-headingFive">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseFive" aria-expanded="false"
+              aria-controls="panelsStayOpen-collapseFive">
+              数据保护与隐私之间有什么区别？
+            </button>
+          </h2>
+          <div id="panelsStayOpen-collapseFive" class="accordion-collapse collapse"
+            aria-labelledby="panelsStayOpen-headingFive">
+            <div class="accordion-body">
+              <p>数据保护是指一系列措施，旨在确保个人数据的安全，包括其完整性、可用性和保密性。而隐私更具体地关注个人信息的使用和披露，即哪些信息可以被收集，谁可以访问这些信息，以及如何使用这些信息。</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item mt-3" data-aos="fade-up" data-aos-easing="ease-in-sine" data-aos-delay="900">
+          <h2 class="accordion-header" id="panelsStayOpen-headingSix">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseSix" aria-expanded="false"
+              aria-controls="panelsStayOpen-collapseSix">
+              个人如何保护自己的在线隐私？
+            </button>
+          </h2>
+          <div id="panelsStayOpen-collapseSix" class="accordion-collapse collapse"
+            aria-labelledby="panelsStayOpen-headingSix">
+            <div class="accordion-body">
+              <p>个人可以通过以下方式保护自己的在线隐私：使用强密码和多因素身份验证，避免在不安全的网络上共享敏感信息，定期检查和更新社交媒体隐私设置，小心处理来自未知来源的电子邮件和链接，以及使用虚拟私人网络等。</p>
+            </div>
+          </div>
+        </div>
+
+
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Action Section Starts -->
+  <section id="action"style="background-color:#ffffff">
+    <div class="container my-5 py-5">
+      <div class="text-center py-5 " data-aos="fade-up" data-aos-easing="ease-in-sine" data-aos-delay="600">
+        <h6>Producer</h6>
+        <h1 class=" text-capitalize mb-3">Made By 许航睿</h1>
+        <p class="">If you have any questions, please contact me.</p>
+        <div class="">
+
+
+          <button type="button" class="btn btn-primary"id=NetworkAttackRealtimeGraph>
+            <span style="text-transform: lowercase;">网络攻击实时图</span>
+            <span class="btnTwo">
+              <iconify-icon icon="prime:arrow-right" class="btn-arrow"></iconify-icon>
+            </span>
+          </button>
+
+
+        </div>
+      </div>
+    </div>
+  </section>
+     <section style="position: fixed;
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+     z-index: 9999;
+     display: none;"
+     id="NetworkAttackRealtimeGraphSection"> 
+     <iframe width="1000" height="1300" style=" clip-path: circle(23%);" src="https://cybermap.kaspersky.com/cn/widget/dynamic/light" frameborder="0"></iframe>
+     <button id="NetworkAttackRealtimeGraphSectionButton" style=" position: absolute;
+     top: 300px;
+     right: 10px;
+     background-color: #000000;
+     border: none;
+     color: white;
+     padding: 10px 20px;
+     text-align: center;
+     text-decoration: none;
+     display: inline-block;
+     font-size: 16px;
+     margin: 4px 2px;
+     cursor: pointer;">X</button>
+    </section>
+ 
+
+  <!-- script ================================================== -->
+  <!-- jQuery 3.7.1 via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <script src="/assets/js/script.js"></script>
+  <script src="/assets/js/index.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/js/bootstrap.bundle.min.js"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/Swiper/9.4.1/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+webserver (1.0.0-1) unstable; urgency=medium
+
+  * Initial release
+  * Enterprise-level directory structure
+  * Epoll + thread pool architecture
+  * MySQL connection pool support
+  * Asynchronous logging system
+  * HTTP/1.1 with Keep-Alive
+  * Reactor/Proactor concurrency models
+  * Comprehensive documentation
+  * Man pages for webserver and webbench
+  * Performance tested with 10000+ concurrent connections
+
+ -- WebServer Team <dev@webserver.org>  Fri, 10 Jan 2026 13:00:00 +0800
+
+webserver (0.9.0-1) experimental; urgency=low
+
+  * Beta release
+  * Core HTTP server functionality
+  * Basic thread pool implementation
+  * MySQL integration
+  * Logging system
+
+ -- WebServer Team <dev@webserver.org>  Mon, 09 Jan 2026 00:00:00 +0800

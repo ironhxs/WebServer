@@ -1,0 +1,250 @@
+# ==============================================================================
+# WebServer .gitignore - Enterprise Level
+# ==============================================================================
+
+# ============= Build Artifacts =============
+# Object files
+*.o
+*.obj
+*.lo
+*.slo
+
+# Compiled executables
+server
+webserver
+*.exe
+*.out
+a.out
+
+# Compiled libraries
+*.so
+*.so.*
+*.dylib
+*.dll
+*.a
+*.lib
+*.la
+
+# Build directories
+build/
+build-*/
+bin/
+obj/
+dist/
+out/
+cmake-build-*/
+
+# ============= Dependencies =============
+# Third-party libraries
+lib/
+vendor/
+node_modules/
+.deps/
+.libs/
+
+# Package management
+*.vcpkg/
+conan/
+
+# ============= Logs & Runtime =============
+# Log files
+*.log
+*ServerLog
+*_log
+nohup.out
+*.out.log
+
+# PID files
+*.pid
+
+# Core dumps
+core
+core.*
+*.core
+
+# ============= Database =============
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.sql.bak
+*.db-shm
+*.db-wal
+
+# ============= Config & Secrets =============
+# Configuration files with sensitive data
+config/server.conf
+*.conf
+!config/*.example
+!*.conf.example
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Credentials
+*.key
+*.pem
+*.crt
+secrets/
+credentials/
+
+# ============= IDE & Editors =============
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+cmake-build-*/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw?
+Session.vim
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Eclipse
+.cproject
+.project
+.settings/
+
+# ============= OS Files =============
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============= Temporary Files =============
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.rej
+*.cache
+*.class
+
+# ============= Documentation =============
+# Generated docs
+docs/html/
+docs/latex/
+docs/doxygen/
+*.aux
+*.toc
+
+# ============= Testing & Coverage =============
+# Test output
+tests/output/
+tests/results/
+*.test
+*.tlog
+
+# Coverage reports
+*.gcov
+*.gcda
+*.gcno
+coverage/
+htmlcov/
+.coverage
+.coverage.*
+
+# ============= Profiling & Debug =============
+# Valgrind
+*.valgrind
+callgrind.out.*
+massif.out.*
+
+# GDB
+.gdb_history
+
+# Perf
+perf.data
+perf.data.old
+
+# ============= Compression & Archives =============
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# ============= Project Specific =============
+# WebServer specific ignores
+resources/webroot/uploads/
+resources/webroot/cache/
+libs/
+vendor/
+node_modules/
+
+# 测试文件
+test_results/
+coverage/
+*.test
+
+# 系统文件
+.directory
+desktop.ini
+
+# 压缩文件
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# 备份文件
+*.bak
+*.backup
+*_backup
+*_old
+
+# 核心转储文件
+core
+core.*
+*.core
+
+# 性能分析文件
+*.prof
+gmon.out
+cachegrind.out.*
+
+# 调试符号
+*.dSYM/
+*.pdb
+
+# 文档生成
+docs/html/
+docs/latex/
+Doxyfile.bak
+
+# ==============================================================================

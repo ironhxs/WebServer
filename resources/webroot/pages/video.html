@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工大风光</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9; /* 浅灰色背景 */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #3498db; /* 蓝色标题，与整体风格一致 */
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .video-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        video {
+            width: 100%;
+            max-width: 906px;
+            border-radius: 10px; /* 圆角边框 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>工大风光</h1>
+
+    <div class="video-container">
+        <!-- 视频展示 -->
+        <video controls>
+            <source src="/assets/media/hfut.mp4" type="video/mp4">
+            您的浏览器不支持视频播放。
+        </video>
+    </div>
+
+    <div class="footer">
+        <p>工大的每一处风景，都是温暖的记忆。</p>
+    </div>
+
+</body>
+</html>

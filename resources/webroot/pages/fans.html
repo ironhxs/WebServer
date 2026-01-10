@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作品信息展示</title>
+    <style>
+        /* 重置样式，保证不同浏览器一致性 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9; /* 浅灰色背景 */
+            color: #333; /* 深灰色文字 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #3498db; /* 主色调 - 蓝色 */
+            font-size: 30px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .info {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .info p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .info strong {
+            font-weight: bold;
+            width: 120px;
+            display: inline-block;
+            color: #555;
+        }
+
+        /* 美化按钮 */
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: #3498db; /* 绿色背景 */
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #2980b9; /* 深蓝色 - 鼠标悬停效果 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>作品信息展示</h1>
+        <div class="info">
+            <p><strong>作品来源:</strong> 计算机网络课程设计--Web服务器</p>
+            <p><strong>作者:</strong> 许航睿</p>
+            <p><strong>学号:</strong> 2022217415</p>
+            <p><strong>班级:</strong> 计算机科学与技术22-3班</p>
+            <p><strong>学校:</strong> 合肥工业大学</p>
+        </div>
+
+        <!-- 返回上一步按钮 -->
+        <a href="javascript:history.back()" class="back-btn">重新选择</a>
+    </div>
+
+</body>
+</html>

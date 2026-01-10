@@ -1,0 +1,59 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# Enable all hardening options
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# Compiler flags
+export DEB_CFLAGS_MAINT_APPEND  = -Wall -Wextra
+export DEB_CXXFLAGS_MAINT_APPEND = -Wall -Wextra
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Build webserver in release mode
+	$(MAKE) DEBUG=0
+	
+	# Build webbench
+	cd tests/benchmark/webbench-1.5 && $(MAKE)
+
+override_dh_auto_install:
+	# Install webserver
+	install -D -m 0755 bin/webserver $(CURDIR)/debian/webserver/usr/bin/webserver
+	
+	# Install webbench
+	install -D -m 0755 bin/webbench $(CURDIR)/debian/webbench/usr/bin/webbench
+	
+	# Install man pages
+	install -D -m 0644 docs/manuals/webserver.1 $(CURDIR)/debian/webserver/usr/share/man/man1/webserver.1
+	install -D -m 0644 docs/manuals/webbench.1 $(CURDIR)/debian/webbench/usr/share/man/man1/webbench.1
+	
+	# Install configuration examples
+	install -D -m 0644 config/server.conf.example $(CURDIR)/debian/webserver/etc/webserver/server.conf.example
+	install -D -m 0644 config/setup_db.sql $(CURDIR)/debian/webserver/usr/share/doc/webserver/setup_db.sql
+	
+	# Install documentation
+	install -D -m 0644 README.md $(CURDIR)/debian/webserver/usr/share/doc/webserver/README.md
+	install -D -m 0644 docs/README.md $(CURDIR)/debian/webserver/usr/share/doc/webserver/README.full.md
+	
+	# Install web resources
+	mkdir -p $(CURDIR)/debian/webserver/var/www/webserver
+	cp -r resources/webroot/* $(CURDIR)/debian/webserver/var/www/webserver/
+
+override_dh_auto_clean:
+	$(MAKE) clean || true
+	cd tests/benchmark/webbench-1.5 && $(MAKE) clean || true
+	dh_auto_clean
+
+override_dh_installdocs:
+	dh_installdocs
+	# Compress man pages
+	gzip -9n $(CURDIR)/debian/webserver/usr/share/man/man1/webserver.1
+	gzip -9n $(CURDIR)/debian/webbench/usr/share/man/man1/webbench.1
+
+.PHONY: override_dh_auto_build override_dh_auto_install override_dh_auto_clean override_dh_installdocs

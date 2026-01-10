@@ -1,0 +1,48 @@
+Source: webserver
+Section: web
+Priority: optional
+Maintainer: WebServer Team <dev@webserver.org>
+Build-Depends: debhelper-compat (= 13),
+               g++ (>= 7.0),
+               libmysqlclient-dev,
+               make
+Standards-Version: 4.6.0
+Homepage: https://github.com/your-repo/WebServer
+Vcs-Browser: https://github.com/your-repo/WebServer
+Vcs-Git: https://github.com/your-repo/WebServer.git
+Rules-Requires-Root: no
+
+Package: webserver
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         mysql-server | mariadb-server
+Recommends: mysql-client | mariadb-client
+Suggests: webbench
+Description: High-performance C++ web server with epoll and thread pool
+ WebServer is a production-ready HTTP/1.1 server featuring:
+  * Epoll-based I/O multiplexing (10000+ concurrent connections)
+  * Thread pool with Reactor/Proactor concurrency models
+  * MySQL connection pool for efficient database operations
+  * Asynchronous logging system
+  * Automatic timeout connection cleanup
+  * Zero-copy file transfer with memory mapping
+ .
+ Ideal for high-traffic websites and web applications requiring
+ high performance and scalability.
+
+Package: webbench
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Simple forking web server benchmark tool
+ Webbench is a simple program for benchmarking HTTP servers using
+ multiple processes to simulate concurrent user traffic.
+ .
+ Features:
+  * Multi-process architecture for accurate load simulation
+  * Support for HTTP/0.9, 1.0, and 1.1 protocols
+  * Proxy support for testing through intermediaries
+  * Configurable client count and test duration
+ .
+ Particularly useful for testing WebServer and other high-performance
+ HTTP servers.

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册</title>
+    <style>
+        /* 重置一些默认样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .register-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            color: #333;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .error-message {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #e74c3c;
+            background-color: #f9e5e5;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .login-link {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .login-link:hover {
+            color: #2980b9;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        <h1><strong>注册</strong></h1>
+        <form action="3CGISQL.cgi" method="post">
+            <div class="input-group">
+                <input type="text" name="user" placeholder="用户名" required="required">
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" placeholder="用户密码" required="required">
+            </div>
+            <button type="submit">注册</button>
+        </form>
+
+        <!-- 登录链接 -->
+        <a href="1" class="login-link">已有账号？登录</a>
+    </div>
+
+</body>
+</html>
