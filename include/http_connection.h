@@ -20,6 +20,12 @@
 #include <sys/wait.h>
 #include <sys/uio.h>
 #include <map>
+#include <unordered_map>
+#include <unordered_set>
+#include <string>
+#include <vector>
+#include <atomic>
+#include <time.h>
 
 #include "thread_sync.h"
 #include "database_pool.h"
@@ -30,8 +36,8 @@ class http_conn
 {
 public:
     static const int FILENAME_LEN = 200;
-    static const int READ_BUFFER_SIZE = 2048;
-    static const int WRITE_BUFFER_SIZE = 40960;
+    static const int READ_BUFFER_SIZE = 64 * 1024;
+    static const int WRITE_BUFFER_SIZE = 8 * 1024;
     enum METHOD
     {
         GET = 0,
@@ -58,6 +64,7 @@ public:
         NO_RESOURCE,
         FORBIDDEN_REQUEST,
         FILE_REQUEST,
+        DYNAMIC_REQUEST,
         PHP_REQUEST,
         INTERNAL_ERROR,
         CLOSED_CONNECTION
@@ -97,7 +104,17 @@ private:
     HTTP_CODE parse_headers(char *text);
     HTTP_CODE parse_content(char *text);
     HTTP_CODE do_request();
-    char *get_line() { return m_read_buf + m_start_line; };
+    HTTP_CODE handle_status_json();
+    HTTP_CODE handle_welcome_page();
+    HTTP_CODE handle_upload_request();
+    HTTP_CODE handle_upload_list();
+    bool user_owns_upload(const std::string &owner, const std::string &stored_name) const;
+    HTTP_CODE handle_user_gallery_page();
+    HTTP_CODE handle_user_video_page();
+    void update_client_ip(const std::string &ip);
+    std::string get_cookie_value(const std::string &key) const;
+    std::string build_page_shell(const std::string &title, const std::string &body) const;
+    char *get_line() { return m_read_buf.data() + m_start_line; };
     LINE_STATUS parse_line();
     void unmap();
     bool add_response(const char *format, ...);
@@ -112,14 +129,20 @@ private:
 public:
     static int m_epollfd;
     static int m_user_count;
+    static locker m_ip_lock;
+    static std::unordered_map<std::string, int> m_ip_counts;
+    static std::unordered_set<std::string> m_unique_ips;
+    static std::atomic<long long> m_total_requests;
+    static time_t m_start_time;
     MYSQL *mysql;
-    int m_state;  //读为0, 写为1
+    int m_state;  // 0 = read, 1 = write
 
 private:
     int m_sockfd;
     char *m_php_content;
+    size_t m_php_content_size;
     sockaddr_in m_address;
-    char m_read_buf[READ_BUFFER_SIZE];
+    std::vector<char> m_read_buf;
     long m_read_idx;
     long m_checked_idx;
     int m_start_line;
@@ -134,18 +157,28 @@ private:
     long m_content_length;
     bool m_linger;
     char *m_file_address;
+    bool m_is_mmap;
+    std::string m_content_type;
+    std::string m_cookie;
+    std::string m_dynamic_content;
+    std::string m_dynamic_content_type;
+    std::string m_username;
+    std::string m_extra_headers;
+    bool m_ip_from_header;
     struct stat m_file_stat;
     struct iovec m_iv[2];
     int m_iv_count;
-    int cgi;        //是否启用的POST
-    char *m_string; //存储请求头数据
+    int cgi;        // Whether POST handling is enabled
+    char *m_string; // Request body buffer
     int bytes_to_send;
     int bytes_have_send;
+    int m_response_status;
     char *doc_root;
 
     map<string, string> m_users;
     int m_TRIGMode;
     int m_close_log;
+    std::string m_ip;
 
     char sql_user[100];
     char sql_passwd[100];

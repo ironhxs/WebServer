@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/media/favicon.ico">
+    <link rel="stylesheet" href="/assets/css/site.css">
+    <title>WebServer | 监控</title>
+</head>
+<body>
+<div class="page">
+<div class="nav">
+    <div class="brand">WebServer 实验站</div>
+    <div class="nav-links">
+        <a href="/">首页</a>
+        <a href="/uploads/list">我的上传</a>
+        <a href="/pages/status.html">监控</a>
+    </div>
+    <div class="nav-auth">
+        <a class="btn ghost" href="/pages/log.html">登录</a>
+        <a class="btn primary" href="/pages/register.html">注册</a>
+    </div>
+</div>
+<section class="panel" style="max-width: 860px; margin: 0 auto;">
+    <h2 style="font-size: 26px;">运行监控</h2>
+    <p style="color: var(--muted); margin-top: 10px;">实时查看服务运行状态与统计信息。</p>
+    <div class="grid" style="margin-top: 18px;">
+        <div class="card"><h3>运行时长</h3><p id="uptime">-</p></div>
+        <div class="card"><h3>在线连接</h3><p id="online">-</p></div>
+        <div class="card"><h3>请求总数</h3><p id="total">-</p></div>
+        <div class="card"><h3>平均 QPS</h3><p id="qps">-</p></div>
+        <div class="card"><h3>服务器时间</h3><p id="time">-</p></div>
+    </div>
+    <div class="actions" style="margin-top: 22px;">
+        <a class="btn primary" href="/status.json">查看 JSON</a>
+    </div>
+</section>
+</div>
+<script>
+const updateStatus = () => {
+    fetch('/status.json').then(r => r.json()).then(data => {
+        const sec = data.uptime_seconds || 0;
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        document.getElementById('uptime').textContent = `${h}h ${m}m ${s}s`;
+        document.getElementById('online').textContent = data.online_connections;
+        document.getElementById('total').textContent = data.total_requests;
+        const qps = typeof data.avg_qps === 'number' ? data.avg_qps : 0;
+        document.getElementById('qps').textContent = qps.toFixed(2);
+        document.getElementById('time').textContent = data.server_time;
+    }).catch(() => {
+        document.getElementById('uptime').textContent = '获取失败';
+    });
+};
+updateStatus();
+setInterval(updateStatus, 2000);
+</script>
+<script src="/assets/js/nav-auth.js"></script>
+</body>
+</html>

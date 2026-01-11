@@ -1,279 +1,562 @@
-# ÏîÄ¿½á¹¹ËµÃ÷ÎÄµµ
+# é¡¹ç›®ç»“æž„è¯´æ˜Žæ–‡æ¡£
 
-## ? Ä¿Â¼½á¹¹
+
+
+## ç›®å½•ç»“æž„
+
+
 
 ```
+
 WebServer/
-©¦
-©À©¤©¤ ? main.cpp                 # Ö÷³ÌÐòÈë¿Ú
-©À©¤©¤ ? config.h/cpp             # ÅäÖÃ½âÎöÄ£¿é
-©À©¤©¤ ? webserver.h/cpp          # ·þÎñÆ÷ºËÐÄÂß¼­
-©À©¤©¤ ? makefile                 # ¹¹½¨ÏµÍ³£¨ÒÑÓÅ»¯£©
-©À©¤©¤ ? build.sh                 # ±àÒë½Å±¾
-©À©¤©¤ ? manage.sh                # ·þÎñÆ÷¹ÜÀí½Å±¾
-©¦
-©À©¤©¤ ? http/                    # HTTPÐ­Òé´¦ÀíÄ£¿é
-©¦   ©À©¤©¤ http_connection.h/cpp    # HTTPÁ¬½ÓÀà
-©¦   ©¸©¤©¤ README.md               # HTTPÄ£¿éËµÃ÷
-©¦
-©À©¤©¤ ? threadpool/              # Ïß³Ì³ØÄ£¿é
-©¦   ©À©¤©¤ threadpool.h            # Ïß³Ì³ØÄ£°åÀà
-©¦   ©¸©¤©¤ README.md               # Ïß³Ì³ØËµÃ÷
-©¦
-©À©¤©¤ ? CGImysql/                # Êý¾Ý¿âÁ¬½Ó³ØÄ£¿é
-©¦   ©À©¤©¤ database_pool.h/cpp     # Á¬½Ó³ØÊµÏÖ
-©¦   ©¸©¤©¤ README.md               # Êý¾Ý¿âÄ£¿éËµÃ÷
-©¦
-©À©¤©¤ ? log/                     # ÈÕÖ¾ÏµÍ³Ä£¿é
-©¦   ©À©¤©¤ log.h/cpp               # ÈÕÖ¾ÀàÊµÏÖ
-©¦   ©À©¤©¤ blocking_queue.h        # ×èÈû¶ÓÁÐ£¨Òì²½ÈÕÖ¾£©
-©¦   ©¸©¤©¤ README.md               # ÈÕÖ¾ÏµÍ³ËµÃ÷
-©¦
-©À©¤©¤ ? timer/                   # ¶¨Ê±Æ÷Ä£¿é
-©¦   ©À©¤©¤ timer_list.h/cpp        # ¶¨Ê±Æ÷Á´±í
-©¦   ©¸©¤©¤ README.md               # ¶¨Ê±Æ÷ËµÃ÷
-©¦
-©À©¤©¤ ? lock/                    # Ïß³ÌÍ¬²½Ä£¿é
-©¦   ©À©¤©¤ thread_sync.h           # Ëø¡¢ÐÅºÅÁ¿¡¢Ìõ¼þ±äÁ¿
-©¦   ©¸©¤©¤ README.md               # Í¬²½»úÖÆËµÃ÷
-©¦
-©À©¤©¤ ? root/                    # ÍøÕ¾×ÊÔ´Ä¿Â¼
-©¦   ©À©¤©¤ index.php               # PHP²âÊÔÒ³Ãæ
-©¦   ©À©¤©¤ judge.html              # µÇÂ¼Ò³Ãæ
-©¦   ©À©¤©¤ register.html           # ×¢²áÒ³Ãæ
-©¦   ©À©¤©¤ welcome.html            # »¶Ó­Ò³Ãæ
-©¦   ©À©¤©¤ 404.html                # 404´íÎóÒ³
-©¦   ©¸©¤©¤ html/                   # ¾²Ì¬×ÊÔ´
-©¦       ©À©¤©¤ index.html          # Ö÷Ò³
-©¦       ©À©¤©¤ style.css           # ÑùÊ½ÎÄ¼þ
-©¦       ©À©¤©¤ images/             # Í¼Æ¬×ÊÔ´
-©¦       ©À©¤©¤ js/                 # JavaScriptÎÄ¼þ
-©¦       ©¸©¤©¤ plugins/            # µÚÈý·½²å¼þ
-©¦
-©À©¤©¤ ? test_pressure/           # Ñ¹Á¦²âÊÔ¹¤¾ß
-©¦   ©¸©¤©¤ webbench-1.5/           # WebbenchÑ¹²â¹¤¾ß
-©¦
-©À©¤©¤ ? README.md                # ÏîÄ¿ÍêÕûÎÄµµ
-©À©¤©¤ ? QUICKSTART.md            # ¿ìËÙÈëÃÅÖ¸ÄÏ
-©À©¤©¤ ? CODE_COMMENTS.md         # ´úÂë×¢ÊÍËµÃ÷
-©À©¤©¤ ? PROJECT_STRUCTURE.md     # ±¾ÎÄ¼þ
-©¦
-©À©¤©¤ ? setup_db.sql             # Êý¾Ý¿â³õÊ¼»¯½Å±¾
-©À©¤©¤ ? server.conf.example      # ÅäÖÃÎÄ¼þÊ¾Àý
-©À©¤©¤ ? .gitignore               # GitºöÂÔÎÄ¼þ
-©¦
-©¸©¤©¤ ? server                   # ±àÒëÉú³ÉµÄ¿ÉÖ´ÐÐÎÄ¼þ
-    ©¸©¤©¤ *.log                   # ÔËÐÐÈÕÖ¾
+
+â”‚
+
+â”œâ”€â”€  main.cpp                 # ä¸»ç¨‹åºå…¥å£
+
+â”œâ”€â”€  config.h/cpp             # é…ç½®è§£æžæ¨¡å—
+
+â”œâ”€â”€  webserver.h/cpp          # æœåŠ¡å™¨æ ¸å¿ƒé€»è¾‘
+
+â”œâ”€â”€  makefile                 # æž„å»ºç³»ç»Ÿï¼ˆå·²ä¼˜åŒ–ï¼‰
+
+â”œâ”€â”€  build.sh                 # ç¼–è¯‘è„šæœ¬
+
+â”œâ”€â”€  manage.sh                # æœåŠ¡å™¨ç®¡ç†è„šæœ¬
+
+â”‚
+
+â”œâ”€â”€  http/                    # HTTPåè®®å¤„ç†æ¨¡å—
+
+â”‚   â”œâ”€â”€ http_connection.h/cpp    # HTTPè¿žæŽ¥ç±»
+
+â”‚   â””â”€â”€ README.md               # HTTPæ¨¡å—è¯´æ˜Ž
+
+â”‚
+
+â”œâ”€â”€  threadpool/              # çº¿ç¨‹æ± æ¨¡å—
+
+â”‚   â”œâ”€â”€ threadpool.h            # çº¿ç¨‹æ± æ¨¡æ¿ç±»
+
+â”‚   â””â”€â”€ README.md               # çº¿ç¨‹æ± è¯´æ˜Ž
+
+â”‚
+
+â”œâ”€â”€  CGImysql/                # æ•°æ®åº“è¿žæŽ¥æ± æ¨¡å—
+
+â”‚   â”œâ”€â”€ database_pool.h/cpp     # è¿žæŽ¥æ± å®žçŽ°
+
+â”‚   â””â”€â”€ README.md               # æ•°æ®åº“æ¨¡å—è¯´æ˜Ž
+
+â”‚
+
+â”œâ”€â”€  log/                     # æ—¥å¿—ç³»ç»Ÿæ¨¡å—
+
+â”‚   â”œâ”€â”€ log.h/cpp               # æ—¥å¿—ç±»å®žçŽ°
+
+â”‚   â”œâ”€â”€ blocking_queue.h        # é˜»å¡žé˜Ÿåˆ—ï¼ˆå¼‚æ­¥æ—¥å¿—ï¼‰
+
+â”‚   â””â”€â”€ README.md               # æ—¥å¿—ç³»ç»Ÿè¯´æ˜Ž
+
+â”‚
+
+â”œâ”€â”€  timer/                   # å®šæ—¶å™¨æ¨¡å—
+
+â”‚   â”œâ”€â”€ timer_list.h/cpp        # å®šæ—¶å™¨é“¾è¡¨
+
+â”‚   â””â”€â”€ README.md               # å®šæ—¶å™¨è¯´æ˜Ž
+
+â”‚
+
+â”œâ”€â”€  lock/                    # çº¿ç¨‹åŒæ­¥æ¨¡å—
+
+â”‚   â”œâ”€â”€ thread_sync.h           # é”ã€ä¿¡å·é‡ã€æ¡ä»¶å˜é‡
+
+â”‚   â””â”€â”€ README.md               # åŒæ­¥æœºåˆ¶è¯´æ˜Ž
+
+â”‚
+
+â”œâ”€â”€  resources/webroot/                    # ç½‘ç«™èµ„æºç›®å½•
+
+â”‚   â”œâ”€â”€ index.html               # é¦–é¡µ
+  â”‚   â”œâ”€â”€ phpinfo.php            # PHP ç¤ºä¾‹é¡µé¢
+
+â”‚   â”œâ”€â”€ pages/log.html              # ç™»å½•é¡µé¢
+
+â”‚   â”œâ”€â”€ pages/register.html           # æ³¨å†Œé¡µé¢
+  â”‚   â”œâ”€â”€ pages/upload.html             # ä¸Šä¼ é¡µé¢
+  â”‚   â”œâ”€â”€ pages/status.html             # ç›‘æŽ§é¡µé¢
+  â”‚   â””â”€â”€ uploads/                      # ä¸Šä¼ æ–‡ä»¶ä¿å­˜ç›®å½•
+
+â”‚   â”œâ”€â”€ pages/welcome.html            # æ¬¢è¿Žé¡µé¢
+
+â”‚   â”œâ”€â”€ 404.html                # 404é”™è¯¯é¡µ
+
+â”‚   â””â”€â”€ assets/                   # é™æ€èµ„æº
+
+â”‚       â”œâ”€â”€ css/          # ä¸»é¡µ
+
+â”‚       â”œâ”€â”€ media/           # æ ·å¼æ–‡ä»¶
+
+â”‚       â”œâ”€â”€ images/             # å›¾ç‰‡èµ„æº
+
+â”‚       â”œâ”€â”€ js/                 # JavaScriptæ–‡ä»¶
+
+â”‚       â””â”€â”€ plugins/            # ç¬¬ä¸‰æ–¹æ’ä»¶
+
+â”‚
+
+â”œâ”€â”€  tests/benchmark/           # åŽ‹åŠ›æµ‹è¯•å·¥å…·
+
+â”‚   â””â”€â”€ webbench-1.5/           # WebbenchåŽ‹æµ‹å·¥å…·
+
+â”‚
+
+â”œâ”€â”€  README.md                # é¡¹ç›®å®Œæ•´æ–‡æ¡£
+
+â”œâ”€â”€  QUICKSTART.md            # å¿«é€Ÿå…¥é—¨æŒ‡å—
+
+â”œâ”€â”€  CODE_COMMENTS.md         # ä»£ç æ³¨é‡Šè¯´æ˜Ž
+
+â”œâ”€â”€  PROJECT_STRUCTURE.md     # æœ¬æ–‡ä»¶
+
+â”‚
+
+â”œâ”€â”€  setup_db.sql             # æ•°æ®åº“åˆå§‹åŒ–è„šæœ¬
+
+â”œâ”€â”€  server.conf.example      # é…ç½®æ–‡ä»¶ç¤ºä¾‹
+
+â”œâ”€â”€  .gitignore               # Gitå¿½ç•¥æ–‡ä»¶
+
+â”‚
+
+â””â”€â”€  server                   # ç¼–è¯‘ç”Ÿæˆçš„å¯æ‰§è¡Œæ–‡ä»¶
+
+    â””â”€â”€ *.log                   # è¿è¡Œæ—¥å¿—
+
+
 
 ```
 
-## ? ºËÐÄÄ£¿éËµÃ÷
 
-### 1. Ö÷³ÌÐòÄ£¿é (main.cpp)
-**Ö°Ôð£º** ³ÌÐòÈë¿Ú£¬³õÊ¼»¯ËùÓÐÄ£¿é²¢Æô¶¯·þÎñÆ÷
-**¹Ø¼üº¯Êý£º**
-- `main()` - Ö÷º¯Êý£¬Ö´ÐÐ³õÊ¼»¯Á÷³Ì
 
-### 2. ÅäÖÃÄ£¿é (config.h/cpp)
-**Ö°Ôð£º** ½âÎöÃüÁîÐÐ²ÎÊý£¬¹ÜÀí·þÎñÆ÷ÅäÖÃ
-**Ö÷ÒªÀà£º** `Config`
-**Ö§³Ö²ÎÊý£º**
-- `-p` ¶Ë¿ÚºÅ
-- `-l` ÈÕÖ¾Ä£Ê½
-- `-m` ´¥·¢Ä£Ê½
-- `-t` Ïß³ÌÊý
-- `-s` Á¬½Ó³Ø´óÐ¡
-- `-o` ÓÅÑÅ¹Ø±Õ
-- `-c` ¹Ø±ÕÈÕÖ¾
-- `-a` ²¢·¢Ä£ÐÍ
+## æ ¸å¿ƒæ¨¡å—è¯´æ˜Ž
 
-### 3. ·þÎñÆ÷ºËÐÄ (webserver.h/cpp)
-**Ö°Ôð£º** ·þÎñÆ÷Ö÷ÒªÂß¼­£¬ÊÂ¼þÑ­»·£¬Á¬½Ó¹ÜÀí
-**Ö÷ÒªÀà£º** `WebServer`
-**ºËÐÄ·½·¨£º**
-- `init()` - ³õÊ¼»¯²ÎÊý
-- `log_write()` - ³õÊ¼»¯ÈÕÖ¾
-- `sql_pool()` - ´´½¨Êý¾Ý¿âÁ¬½Ó³Ø
-- `thread_pool()` - ´´½¨Ïß³Ì³Ø
-- `eventListen()` - ¿ªÊ¼¼àÌý
-- `eventLoop()` - ÊÂ¼þÑ­»·Ö÷º¯Êý
 
-### 4. HTTP´¦ÀíÄ£¿é (http/)
-**Ö°Ôð£º** ½âÎöHTTPÇëÇó£¬Éú³ÉHTTPÏìÓ¦
-**Ö÷ÒªÀà£º** `HttpConnection`
-**¹¦ÄÜ£º**
-- HTTPÇëÇó½âÎö£¨ÇëÇóÐÐ¡¢ÇëÇóÍ·¡¢ÇëÇóÌå£©
-- ¾²Ì¬×ÊÔ´·þÎñ£¨Áã¿½±´mmap£©
-- CGIÖ§³Ö£¨PHPÖ´ÐÐ£©
-- Keep-AliveÁ¬½Ó¹ÜÀí
-- ÓÃ»§µÇÂ¼/×¢²á
 
-### 5. Ïß³Ì³ØÄ£¿é (threadpool/)
-**Ö°Ôð£º** ¹ÜÀí¹¤×÷Ïß³Ì£¬²¢·¢´¦ÀíÇëÇó
-**Ö÷ÒªÀà£º** `threadpool<T>`
-**ÌØÐÔ£º**
-- Ô¤´´½¨¹Ì¶¨ÊýÁ¿Ïß³Ì
-- ÇëÇó¶ÓÁÐ£¨FIFO£©
-- ÐÅºÅÁ¿+»¥³âËøÍ¬²½
-- Ö§³ÖReactor/ProactorÄ£Ê½
+### 1. ä¸»ç¨‹åºæ¨¡å— (main.cpp)
 
-### 6. Êý¾Ý¿âÁ¬½Ó³Ø (CGImysql/)
-**Ö°Ôð£º** ¹ÜÀíMySQLÁ¬½Ó£¬Ìá¹©Á¬½Ó¸´ÓÃ
-**Ö÷ÒªÀà£º** `connection_pool`
-**¹¦ÄÜ£º**
-- Á¬½ÓÔ¤´´½¨
-- Á¬½Ó»ñÈ¡/ÊÍ·Å
-- µ¥ÀýÄ£Ê½
-- Ïß³Ì°²È«
+**èŒè´£ï¼š** ç¨‹åºå…¥å£ï¼Œåˆå§‹åŒ–æ‰€æœ‰æ¨¡å—å¹¶å¯åŠ¨æœåŠ¡å™¨
 
-### 7. ÈÕÖ¾ÏµÍ³ (log/)
-**Ö°Ôð£º** ¼ÇÂ¼·þÎñÆ÷ÔËÐÐÐÅÏ¢£¬Ö§³ÖÒì²½Ð´Èë
-**Ö÷ÒªÀà£º** `Log`
-**ÌØÐÔ£º**
-- Í¬²½/Òì²½ÈÕÖ¾
-- ÈÕÖ¾·Ö¸î£¨°´ÈÕÆÚ/´óÐ¡£©
-- ×èÈû¶ÓÁÐ£¨Òì²½Ä£Ê½£©
-- ÈÕÖ¾¼¶±ð¿ØÖÆ
+**å…³é”®å‡½æ•°ï¼š**
 
-### 8. ¶¨Ê±Æ÷Ä£¿é (timer/)
-**Ö°Ôð£º** ¹ÜÀíÁ¬½Ó³¬Ê±£¬×Ô¶¯ÇåÀí·Ç»î¶¯Á¬½Ó
-**Ö÷ÒªÀà£º** `util_timer`
-**ÊµÏÖ£º** ÉýÐòÁ´±í
-**¹¦ÄÜ£º**
-- Á¬½Ó³¬Ê±¼ì²â
-- ¶¨Ê±ÈÎÎñµ÷¶È
-- ·Ç»î¶¯Á¬½ÓÇåÀí
+- `main()` - ä¸»å‡½æ•°ï¼Œæ‰§è¡Œåˆå§‹åŒ–æµç¨‹
 
-### 9. Ïß³ÌÍ¬²½Ä£¿é (lock/)
-**Ö°Ôð£º** Ìá¹©Ïß³ÌÍ¬²½Ô­Óï
-**Ö÷ÒªÀà£º**
-- `locker` - »¥³âËø£¨RAII·â×°£©
-- `cond` - Ìõ¼þ±äÁ¿
-- `sem` - ÐÅºÅÁ¿
 
-## ? Êý¾ÝÁ÷Í¼
+
+### 2. é…ç½®æ¨¡å— (config.h/cpp)
+
+**èŒè´£ï¼š** è§£æžå‘½ä»¤è¡Œå‚æ•°ï¼Œç®¡ç†æœåŠ¡å™¨é…ç½®
+
+**ä¸»è¦ç±»ï¼š** `Config`
+
+**æ”¯æŒå‚æ•°ï¼š**
+
+- `-p` ç«¯å£å·
+
+- `-l` æ—¥å¿—æ¨¡å¼
+
+- `-m` è§¦å‘æ¨¡å¼
+
+- `-t` çº¿ç¨‹æ•°
+
+- `-s` è¿žæŽ¥æ± å¤§å°
+
+- `-o` ä¼˜é›…å…³é—­
+
+- `-c` å…³é—­æ—¥å¿—
+
+- `-a` å¹¶å‘æ¨¡åž‹
+
+
+
+### 3. æœåŠ¡å™¨æ ¸å¿ƒ (webserver.h/cpp)
+
+**èŒè´£ï¼š** æœåŠ¡å™¨ä¸»è¦é€»è¾‘ï¼Œäº‹ä»¶å¾ªçŽ¯ï¼Œè¿žæŽ¥ç®¡ç†
+
+**ä¸»è¦ç±»ï¼š** `WebServer`
+
+**æ ¸å¿ƒæ–¹æ³•ï¼š**
+
+- `init()` - åˆå§‹åŒ–å‚æ•°
+
+- `log_write()` - åˆå§‹åŒ–æ—¥å¿—
+
+- `sql_pool()` - åˆ›å»ºæ•°æ®åº“è¿žæŽ¥æ± 
+
+- `thread_pool()` - åˆ›å»ºçº¿ç¨‹æ± 
+
+- `eventListen()` - å¼€å§‹ç›‘å¬
+
+- `eventLoop()` - äº‹ä»¶å¾ªçŽ¯ä¸»å‡½æ•°
+
+
+
+### 4. HTTPå¤„ç†æ¨¡å— (http/)
+
+**èŒè´£ï¼š** è§£æžHTTPè¯·æ±‚ï¼Œç”ŸæˆHTTPå“åº”
+
+**ä¸»è¦ç±»ï¼š** `HttpConnection`
+
+**åŠŸèƒ½ï¼š**
+
+- HTTPè¯·æ±‚è§£æžï¼ˆè¯·æ±‚è¡Œã€è¯·æ±‚å¤´ã€è¯·æ±‚ä½“ï¼‰
+
+- é™æ€èµ„æºæœåŠ¡ï¼ˆé›¶æ‹·è´mmapï¼‰
+
+- CGIæ”¯æŒï¼ˆPHPæ‰§è¡Œï¼‰
+
+- Keep-Aliveè¿žæŽ¥ç®¡ç†
+
+- ç”¨æˆ·ç™»å½•/æ³¨å†Œ
+
+
+
+### 5. çº¿ç¨‹æ± æ¨¡å— (threadpool/)
+
+**èŒè´£ï¼š** ç®¡ç†å·¥ä½œçº¿ç¨‹ï¼Œå¹¶å‘å¤„ç†è¯·æ±‚
+
+**ä¸»è¦ç±»ï¼š** `threadpool<T>`
+
+**ç‰¹æ€§ï¼š**
+
+- é¢„åˆ›å»ºå›ºå®šæ•°é‡çº¿ç¨‹
+
+- è¯·æ±‚é˜Ÿåˆ—ï¼ˆFIFOï¼‰
+
+- ä¿¡å·é‡+äº’æ–¥é”åŒæ­¥
+
+- æ”¯æŒReactor/Proactoræ¨¡å¼
+
+
+
+### 6. æ•°æ®åº“è¿žæŽ¥æ±  (CGImysql/)
+
+**èŒè´£ï¼š** ç®¡ç†MySQLè¿žæŽ¥ï¼Œæä¾›è¿žæŽ¥å¤ç”¨
+
+**ä¸»è¦ç±»ï¼š** `connection_pool`
+
+**åŠŸèƒ½ï¼š**
+
+- è¿žæŽ¥é¢„åˆ›å»º
+
+- è¿žæŽ¥èŽ·å–/é‡Šæ”¾
+
+- å•ä¾‹æ¨¡å¼
+
+- çº¿ç¨‹å®‰å…¨
+
+
+
+### 7. æ—¥å¿—ç³»ç»Ÿ (log/)
+
+**èŒè´£ï¼š** è®°å½•æœåŠ¡å™¨è¿è¡Œä¿¡æ¯ï¼Œæ”¯æŒå¼‚æ­¥å†™å…¥
+
+**ä¸»è¦ç±»ï¼š** `Log`
+
+**ç‰¹æ€§ï¼š**
+
+- åŒæ­¥/å¼‚æ­¥æ—¥å¿—
+
+- æ—¥å¿—åˆ†å‰²ï¼ˆæŒ‰æ—¥æœŸ/å¤§å°ï¼‰
+
+- é˜»å¡žé˜Ÿåˆ—ï¼ˆå¼‚æ­¥æ¨¡å¼ï¼‰
+
+- æ—¥å¿—çº§åˆ«æŽ§åˆ¶
+
+
+
+### 8. å®šæ—¶å™¨æ¨¡å— (timer/)
+
+**èŒè´£ï¼š** ç®¡ç†è¿žæŽ¥è¶…æ—¶ï¼Œè‡ªåŠ¨æ¸…ç†éžæ´»åŠ¨è¿žæŽ¥
+
+**ä¸»è¦ç±»ï¼š** `util_timer`
+
+**å®žçŽ°ï¼š** å‡åºé“¾è¡¨
+
+**åŠŸèƒ½ï¼š**
+
+- è¿žæŽ¥è¶…æ—¶æ£€æµ‹
+
+- å®šæ—¶ä»»åŠ¡è°ƒåº¦
+
+- éžæ´»åŠ¨è¿žæŽ¥æ¸…ç†
+
+
+
+### 9. çº¿ç¨‹åŒæ­¥æ¨¡å— (lock/)
+
+**èŒè´£ï¼š** æä¾›çº¿ç¨‹åŒæ­¥åŽŸè¯­
+
+**ä¸»è¦ç±»ï¼š**
+
+- `locker` - äº’æ–¥é”ï¼ˆRAIIå°è£…ï¼‰
+
+- `cond` - æ¡ä»¶å˜é‡
+
+- `sem` - ä¿¡å·é‡
+
+
+
+## æ•°æ®æµå›¾
+
+
 
 ```
-¿Í»§¶ËÇëÇó
-    ¡ý
-¼àÌýSocket (Ö÷Ïß³Ì)
-    ¡ý
-EpollÊÂ¼þÍ¨Öª
-    ¡ý
-Ö÷Ïß³Ìaccept() / ¹¤×÷Ïß³Ìrecv() [¸ù¾ÝÄ£ÐÍ]
-    ¡ý
-ÇëÇó¶ÓÁÐ (Ïß³Ì³Ø)
-    ¡ý
-¹¤×÷Ïß³Ì»ñÈ¡ÈÎÎñ
-    ¡ý
-HTTP½âÎö ¡ú ÒµÎñ´¦Àí ¡ú ÏìÓ¦Éú³É
+
+å®¢æˆ·ç«¯è¯·æ±‚
+
+    â†“
+
+ç›‘å¬Socket (ä¸»çº¿ç¨‹)
+
+    â†“
+
+Epolläº‹ä»¶é€šçŸ¥
+
+    â†“
+
+ä¸»çº¿ç¨‹accept() / å·¥ä½œçº¿ç¨‹recv() [æ ¹æ®æ¨¡åž‹]
+
+    â†“
+
+è¯·æ±‚é˜Ÿåˆ— (çº¿ç¨‹æ± )
+
+    â†“
+
+å·¥ä½œçº¿ç¨‹èŽ·å–ä»»åŠ¡
+
+    â†“
+
+HTTPè§£æž â†’ ä¸šåŠ¡å¤„ç† â†’ å“åº”ç”Ÿæˆ
+
     |              |
-    |              ¡ý
-    |         Êý¾Ý¿âÁ¬½Ó³Ø
+
+    |              â†“
+
+    |         æ•°æ®åº“è¿žæŽ¥æ± 
+
     |              |
-    ¡ý              ¡ý
-·¢ËÍÏìÓ¦ ¡û ÈÕÖ¾¼ÇÂ¼
-    ¡ý
-¿Í»§¶Ë½ÓÊÕ
+
+    â†“              â†“
+
+å‘é€å“åº” â† æ—¥å¿—è®°å½•
+
+    â†“
+
+å®¢æˆ·ç«¯æŽ¥æ”¶
+
 ```
 
-## ? ÇëÇó´¦ÀíÁ÷³Ì
 
-### ProactorÄ£Ê½£¨actor_model=0£©
-```
-1. Ö÷Ïß³Ìepoll_wait()¼àÌýÊÂ¼þ
-2. Ö÷Ïß³Ìaccept()ÐÂÁ¬½Ó
-3. Ö÷Ïß³Ìrecv()¶ÁÈ¡ÇëÇóÊý¾Ý
-4. Ö÷Ïß³Ì½«ÈÎÎñ·ÅÈëÇëÇó¶ÓÁÐ
-5. ¹¤×÷Ïß³Ì´Ó¶ÓÁÐÈ¡ÈÎÎñ
-6. ¹¤×÷Ïß³Ì½âÎöHTTPÇëÇó
-7. ¹¤×÷Ïß³Ì´¦ÀíÒµÎñÂß¼­
-8. ¹¤×÷Ïß³Ìsend()·¢ËÍÏìÓ¦
+
+## è¯·æ±‚å¤„ç†æµç¨‹
+
+
+
+### Proactoræ¨¡å¼ï¼ˆactor_model=0ï¼‰
+
 ```
 
-### ReactorÄ£Ê½£¨actor_model=1£©
+1. ä¸»çº¿ç¨‹epoll_wait()ç›‘å¬äº‹ä»¶
+
+2. ä¸»çº¿ç¨‹accept()æ–°è¿žæŽ¥
+
+3. ä¸»çº¿ç¨‹recv()è¯»å–è¯·æ±‚æ•°æ®
+
+4. ä¸»çº¿ç¨‹å°†ä»»åŠ¡æ”¾å…¥è¯·æ±‚é˜Ÿåˆ—
+
+5. å·¥ä½œçº¿ç¨‹ä»Žé˜Ÿåˆ—å–ä»»åŠ¡
+
+6. å·¥ä½œçº¿ç¨‹è§£æžHTTPè¯·æ±‚
+
+7. å·¥ä½œçº¿ç¨‹å¤„ç†ä¸šåŠ¡é€»è¾‘
+
+8. å·¥ä½œçº¿ç¨‹send()å‘é€å“åº”
+
 ```
-1. Ö÷Ïß³Ìepoll_wait()¼àÌýÊÂ¼þ
-2. Ö÷Ïß³Ìaccept()ÐÂÁ¬½Ó
-3. Ö÷Ïß³Ì½«ÈÎÎñ·ÅÈëÇëÇó¶ÓÁÐ
-4. ¹¤×÷Ïß³Ì´Ó¶ÓÁÐÈ¡ÈÎÎñ
-5. ¹¤×÷Ïß³Ìrecv()¶ÁÈ¡ÇëÇó
-6. ¹¤×÷Ïß³Ì½âÎöHTTPÇëÇó
-7. ¹¤×÷Ïß³Ì´¦ÀíÒµÎñÂß¼­
-8. ¹¤×÷Ïß³Ìsend()·¢ËÍÏìÓ¦
+
+
+
+### Reactoræ¨¡å¼ï¼ˆactor_model=1ï¼‰
+
 ```
 
-## ? ÐÔÄÜÓÅ»¯Òªµã
+1. ä¸»çº¿ç¨‹epoll_wait()ç›‘å¬äº‹ä»¶
 
-### 1. I/O¶àÂ·¸´ÓÃ
-- Ê¹ÓÃEpoll£¨Linux£©
-- Ö§³ÖLT/ET´¥·¢Ä£Ê½
-- ·Ç×èÈûSocket
+2. ä¸»çº¿ç¨‹accept()æ–°è¿žæŽ¥
 
-### 2. ²¢·¢´¦Àí
-- Ïß³Ì³Ø£¨±ÜÃâÆµ·±´´½¨Ïú»Ù£©
-- ÇëÇó¶ÓÁÐ£¨½âñî£©
-- ÐÅºÅÁ¿Í¬²½£¨¸ßÐ§£©
+3. ä¸»çº¿ç¨‹å°†ä»»åŠ¡æ”¾å…¥è¯·æ±‚é˜Ÿåˆ—
 
-### 3. Á¬½Ó¹ÜÀí
-- Êý¾Ý¿âÁ¬½Ó³Ø£¨¸´ÓÃÁ¬½Ó£©
-- Keep-Alive£¨HTTP³Ö¾ÃÁ¬½Ó£©
-- ¶¨Ê±Æ÷£¨³¬Ê±ÇåÀí£©
+4. å·¥ä½œçº¿ç¨‹ä»Žé˜Ÿåˆ—å–ä»»åŠ¡
 
-### 4. Áã¿½±´¼¼Êõ
-- mmapÄÚ´æÓ³Éä£¨¾²Ì¬ÎÄ¼þ£©
-- writev¾Û¼¯Ð´£¨ÏìÓ¦Í·+Ìå£©
+5. å·¥ä½œçº¿ç¨‹recv()è¯»å–è¯·æ±‚
 
-### 5. ÈÕÖ¾ÓÅ»¯
-- Òì²½ÈÕÖ¾£¨²»×èÈû¹¤×÷Ïß³Ì£©
-- ÈÕÖ¾·Ö¸î£¨±ÜÃâÎÄ¼þ¹ý´ó£©
+6. å·¥ä½œçº¿ç¨‹è§£æžHTTPè¯·æ±‚
 
-## ? ¿ª·¢¹æ·¶
+7. å·¥ä½œçº¿ç¨‹å¤„ç†ä¸šåŠ¡é€»è¾‘
 
-### ´úÂë·ç¸ñ
-- Ê¹ÓÃC++11±ê×¼
-- ×ñÑ­Google C++·ç¸ñÖ¸ÄÏ
-- º¯Êý²»³¬¹ý50ÐÐ
-- ÎÄ¼þ²»³¬¹ý1000ÐÐ
+8. å·¥ä½œçº¿ç¨‹send()å‘é€å“åº”
 
-### ÃüÃû¹æ·¶
-- ÀàÃû£º´óÍÕ·å£¨Èç `WebServer`£©
-- º¯ÊýÃû£ºÐ¡Ð´+ÏÂ»®Ïß£¨Èç `event_loop`£©
-- ³ÉÔ±±äÁ¿£º`m_`Ç°×º£¨Èç `m_port`£©
-- ³£Á¿£ºÈ«´óÐ´+ÏÂ»®Ïß£¨Èç `MAX_FD`£©
+```
 
-### ×¢ÊÍ¹æ·¶
-- Ê¹ÓÃDoxygen¸ñÊ½
-- Ã¿¸öº¯Êý¶¼ÓÐ×¢ÊÍ
-- ¸´ÔÓÂß¼­Ìí¼Ó×¢ÊÍ
-- ×¢ÊÍËµÃ÷"ÎªÊ²Ã´"¶ø²»Ö»ÊÇ"×öÊ²Ã´"
 
-## ? ¹¹½¨ÏµÍ³
 
-### MakefileÄ¿±ê
+## æ€§èƒ½ä¼˜åŒ–è¦ç‚¹
+
+
+
+### 1. I/Oå¤šè·¯å¤ç”¨
+
+- ä½¿ç”¨Epollï¼ˆLinuxï¼‰
+
+- æ”¯æŒLT/ETè§¦å‘æ¨¡å¼
+
+- éžé˜»å¡žSocket
+
+
+
+### 2. å¹¶å‘å¤„ç†
+
+- çº¿ç¨‹æ± ï¼ˆé¿å…é¢‘ç¹åˆ›å»ºé”€æ¯ï¼‰
+
+- è¯·æ±‚é˜Ÿåˆ—ï¼ˆè§£è€¦ï¼‰
+
+- ä¿¡å·é‡åŒæ­¥ï¼ˆé«˜æ•ˆï¼‰
+
+
+
+### 3. è¿žæŽ¥ç®¡ç†
+
+- æ•°æ®åº“è¿žæŽ¥æ± ï¼ˆå¤ç”¨è¿žæŽ¥ï¼‰
+
+- Keep-Aliveï¼ˆHTTPæŒä¹…è¿žæŽ¥ï¼‰
+
+- å®šæ—¶å™¨ï¼ˆè¶…æ—¶æ¸…ç†ï¼‰
+
+
+
+### 4. é›¶æ‹·è´æŠ€æœ¯
+
+- mmapå†…å­˜æ˜ å°„ï¼ˆé™æ€æ–‡ä»¶ï¼‰
+
+- writevèšé›†å†™ï¼ˆå“åº”å¤´+ä½“ï¼‰
+
+
+
+### 5. æ—¥å¿—ä¼˜åŒ–
+
+- å¼‚æ­¥æ—¥å¿—ï¼ˆä¸é˜»å¡žå·¥ä½œçº¿ç¨‹ï¼‰
+
+- æ—¥å¿—åˆ†å‰²ï¼ˆé¿å…æ–‡ä»¶è¿‡å¤§ï¼‰
+
+
+
+## å¼€å‘è§„èŒƒ
+
+
+
+### ä»£ç é£Žæ ¼
+
+- ä½¿ç”¨C++11æ ‡å‡†
+
+- éµå¾ªGoogle C++é£Žæ ¼æŒ‡å—
+
+- å‡½æ•°ä¸è¶…è¿‡50è¡Œ
+
+- æ–‡ä»¶ä¸è¶…è¿‡1000è¡Œ
+
+
+
+### å‘½åè§„èŒƒ
+
+- ç±»åï¼šå¤§é©¼å³°ï¼ˆå¦‚ `WebServer`ï¼‰
+
+- å‡½æ•°åï¼šå°å†™+ä¸‹åˆ’çº¿ï¼ˆå¦‚ `event_loop`ï¼‰
+
+- æˆå‘˜å˜é‡ï¼š`m_`å‰ç¼€ï¼ˆå¦‚ `m_port`ï¼‰
+
+- å¸¸é‡ï¼šå…¨å¤§å†™+ä¸‹åˆ’çº¿ï¼ˆå¦‚ `MAX_FD`ï¼‰
+
+
+
+### æ³¨é‡Šè§„èŒƒ
+
+- ä½¿ç”¨Doxygenæ ¼å¼
+
+- æ¯ä¸ªå‡½æ•°éƒ½æœ‰æ³¨é‡Š
+
+- å¤æ‚é€»è¾‘æ·»åŠ æ³¨é‡Š
+
+- æ³¨é‡Šè¯´æ˜Ž"ä¸ºä»€ä¹ˆ"è€Œä¸åªæ˜¯"åšä»€ä¹ˆ"
+
+
+
+## æž„å»ºç³»ç»Ÿ
+
+
+
+### Makefileç›®æ ‡
+
 ```bash
-make            # ±àÒë£¨Ä¬ÈÏDEBUGÄ£Ê½£©
-make DEBUG=0    # ·¢²¼°æ±¾±àÒë
-make clean      # ÇåÀí¹¹½¨ÎÄ¼þ
-make distclean  # Éî¶ÈÇåÀí£¨°üÀ¨ÈÕÖ¾£©
-make rebuild    # ÖØÐÂ±àÒë
-make run        # ±àÒë²¢ÔËÐÐ
-make start      # ºóÌ¨ÔËÐÐ
-make stop       # Í£Ö¹·þÎñÆ÷
-make status     # ²é¿´×´Ì¬
-make log        # ²é¿´ÈÕÖ¾
-make deps       # °²×°ÒÀÀµ
-make help       # ÏÔÊ¾°ïÖú
+
+make            # ç¼–è¯‘ï¼ˆé»˜è®¤DEBUGæ¨¡å¼ï¼‰
+
+make DEBUG=0    # å‘å¸ƒç‰ˆæœ¬ç¼–è¯‘
+
+make clean      # æ¸…ç†æž„å»ºæ–‡ä»¶
+
+make distclean  # æ·±åº¦æ¸…ç†ï¼ˆåŒ…æ‹¬æ—¥å¿—ï¼‰
+
+make rebuild    # é‡æ–°ç¼–è¯‘
+
+make run        # ç¼–è¯‘å¹¶è¿è¡Œ
+
+make start      # åŽå°è¿è¡Œ
+
+make stop       # åœæ­¢æœåŠ¡å™¨
+
+make status     # æŸ¥çœ‹çŠ¶æ€
+
+make log        # æŸ¥çœ‹æ—¥å¿—
+
+make deps       # å®‰è£…ä¾èµ–
+
+make help       # æ˜¾ç¤ºå¸®åŠ©
+
 ```
 
-## ? ÎÄµµË÷Òý
 
-- [README.md](README.md) - ÍêÕûÏîÄ¿ÎÄµµ
-- [QUICKSTART.md](QUICKSTART.md) - ¿ìËÙÈëÃÅ
-- [CODE_COMMENTS.md](CODE_COMMENTS.md) - ´úÂë×¢ÊÍËµÃ÷
-- [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - ±¾ÎÄ¼þ
+
+## æ–‡æ¡£ç´¢å¼•
+
+
+
+- [README.md](README.md) - å®Œæ•´é¡¹ç›®æ–‡æ¡£
+
+- [QUICKSTART.md](QUICKSTART.md) - å¿«é€Ÿå…¥é—¨
+
+- [CODE_COMMENTS.md](CODE_COMMENTS.md) - ä»£ç æ³¨é‡Šè¯´æ˜Ž
+
+- [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - æœ¬æ–‡ä»¶
+
+
 
 ---
 
-**×îºó¸üÐÂ£º** 2026-01-09  
-**ÎÄµµ°æ±¾£º** v2.0
+
+
+**æœ€åŽæ›´æ–°ï¼š** 2026-01-09  
+
+**æ–‡æ¡£ç‰ˆæœ¬ï¼š** v2.0
+

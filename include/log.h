@@ -22,6 +22,7 @@ public:
 
     static void *flush_log_thread(void *args)
     {
+        (void)args;
         Log::get_instance()->async_write_log();
         return nullptr;
     }

@@ -1,7 +1,7 @@
 -- 创建数据库和用户表
-CREATE DATABASE IF NOT EXISTS xhrdb;
+CREATE DATABASE IF NOT EXISTS hxsdb;
 
-USE xhrdb;
+USE hxsdb;
 
 -- 创建用户表
 CREATE TABLE IF NOT EXISTS user (

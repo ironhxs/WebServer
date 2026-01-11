@@ -1,157 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-    <title>Hosthub - Web Hosting Free Bootstrap Website Template</title>
-
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" type="text/css" href="css/vendor.css">
-    <!-- Link Swiper's CSS -->
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/Swiper/9.4.1/swiper-bundle.min.css" />
-    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/css/bootstrap.min.css" rel="stylesheet"
-       >
-    <link rel="stylesheet" type="text/css" href="style.css">
-
-    <!-- Google Fonts ================================================== -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500&family=Raleway:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-
-
-    <!-- script ================================================== -->
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=/demo.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/assets/media/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <title>WebServer | 演示</title>
 </head>
-
-<body data-bs-spy="scroll" data-bs-target="#header-nav" tabindex="0">
-
-    <!-- scroll-top section -->
-    <div id="scroll-top-btn" class="bg-white rounded-pill text-primary position-fixed">
-        <iconify-icon icon="ph:arrow-up-light" class="scroll-icon p-2 pb-0"></iconify-icon>
-    </div>
-
-  <!-- Nav Section Starts -->
-
-    <section id="billboard" style="background: linear-gradient(76.38deg, #121B52 0%, #5F1C8A 100%);"> 
-        <div class="container padding-medium">
-            <div class="row ">
-                <div class="col ">
-                    <h1 class="text-light ">威胁与攻击</h1>
-                    <div class="breadcrumb ">
-                        <span class="item"><a href="/pages/advanced/index.html" class="">
-                                <h5 class="text-light"> <b>网络安全</b> </h5>
-                            </a></span> &nbsp; <h5 class="text-light">/</h5> &nbsp; <span class="item">
-                            <h5 class="text-light">威胁与攻击</h5>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="post-wrap py-5 no-padding-bottom">
-      <div class="container"style="width: 8000px;">
-        <div class="row g-5 mt-4"style="width:150%;">
-          <main class="post-grid col-md-9">
-            <div class="row">
-              <article class="post-item">
-                <h2 class=" mb-5">内部威胁</h2>
-                <div class="post-content py-5">
-                  <div class="post-description">
-                    <p>内部威胁指的是组织内部人员发起的攻击。这些攻击者通常是公司的员工、承包商或业务伙伴，他们利用自身的访问权限执行数据窃取、系统破坏或其他恶意活动。内部攻击的危害在于攻击者对组织的业务和系统较为熟悉，能够轻易绕过初级的安全防护措施。</p>
-                    <h4 class="mt-4">防御措施</h4>
-                    <ul class="inner-list mb-4">
-                      <li>权限最小化原则：确保每个员工仅拥有完成工作所必需的访问权限。</li>
-                      <li>定期审计和监控：实施定期的访问权限审查和监控员工活动，以便及时发现和处理异常行为。</li>
-                      <li>员工安全培训：通过定期培训提高员工的安全意识，让他们了解如何安全处理数据，并识别潜在的内部威胁。</li>
-                    </ul>
-                  </div>
-                </div>
-              </article>
-              <article class="post-item">
-                <h2 class=" mb-5">外部威胁</h2>
-                <div class="post-content py-5">
-                  <div class="post-description">
-                    <p>外部威胁是指来源于组织外部的攻击者试图侵入企业网络的行为。攻击者可能包括黑客、商业竞争对手或犯罪组织，他们使用各种技术如病毒、木马和其他恶意软件来窃取公司机密、客户数据或财务信息。</p>
-                    <h4 class="mt-4">防御措施</h4>
-                    <ul class="inner-list mb-4">
-                      <li>防火墙和入侵防御系统：部署防火墙和入侵检测系统（IDS）来监控和控制进出网络的通信。</li>
-                      <li>漏洞管理：定期扫描和修补系统漏洞，尤其是那些可能被外部攻击者利用的重要系统。</li>
-                      <li>网络隔离和分层：将关键数据和服务在网络架构中隔离，使用不同的网络层次以减少潜在的攻击面。</li>
-                    </ul>
-                  </div>
-                </div>
-              </article>
-              <article class="post-item">
-                <h2 class=" mb-5">APT攻击</h2>
-                <div class="post-content py-5">
-                  <div class="post-description">
-                    <p>APT攻击，即高级持续性威胁，通常由国家支持的黑客或大型犯罪集团发起，目的是长期潜伏于目标网络中窃取高价值信息或破坏关键基础设施。APT攻击的特点是高度隐蔽、持续性强和攻击手法复杂。</p>
-                    <h4 class="mt-4">防御措施</h4>
-                    <ul class="inner-list mb-4">
-                      <li>多层防御策略：实施多层防御机制，如深度包检测、异常行为分析和综合威胁情报。</li>
-                      <li>定期渗透测试：通过模拟APT攻击来检测系统的弱点和漏洞。</li>
-                      <li>高级威胁检测工具：使用基于人工智能的威胁检测工具，以便更有效地识别和响应复杂的攻击模式。</li>
-                    </ul>
-                  </div>
-                </div>
-              </article>
-              <article class="post-item">
-                <h2 class=" mb-5">中间人攻击</h2>
-                <div class="post-content py-5">
-                  <div class="post-description">
-                    <p>中间人攻击（MITM）是攻击者插入到通信双方之间，未经授权秘密监听或篡改交换的信息。此类攻击常见于未加密的Wi-Fi网络和公共网络，可能导致个人敏感信息（如登录凭证、信用卡信息等）被盗。</p>
-                    <h4 class="mt-4">防御措施</h4>
-                    <ul class="inner-list mb-4">
-                      <li>强制加密通信：确保所有数据传输都通过SSL/TLS等加密协议进行。</li>
-                      <li>安全的Wi-Fi设置：使用WPA2或更高标准加密的Wi-Fi网络，避免在公共或不安全的网络上进行敏感操作。</li>
-                      <li>VPN使用：在任何公共网络上进行通信时使用虚拟私人网络（VPN）来保护数据传输安全。</li>
-                    </ul>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </main>
-
-        </div>
+<body>
+  <div class="page">
+    <div class="panel" style="max-width: 720px; margin: 80px auto; text-align: center;">
+      <h2 style="font-size: 24px;">页面已并入演示</h2>
+      <p style="margin-top: 12px; color: var(--muted);">正在跳转到演示页，如果没有自动跳转，请点击下方按钮。</p>
+      <div class="actions" style="justify-content: center; margin-top: 20px;">
+        <a class="btn primary" href="/demo.html">进入演示</a>
+        <a class="btn ghost" href="/">返回首页</a>
       </div>
     </div>
-  
-
-
-
-    <section id="action"style="background-color:#f2f6fb">
-      <div class="container my-5 py-5">
-        <div class="text-center py-5 " data-aos="fade-up" data-aos-easing="ease-in-sine" data-aos-delay="600">
-          <h6>Producer</h6>
-          <h1 class=" text-capitalize mb-3">Made By 许航睿</h1>
-          <p class="">If you have any questions, please contact me.</p>
-          <div class="">
-
-          </div>
-        </div>
-      </div>
-    </section>
-
-
-
-    <!-- script ================================================== -->
-    <!-- jQuery 3.7.1 via CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <script src="/assets/js/script.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/js/bootstrap.bundle.min.js"
-        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/Swiper/9.4.1/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
-
-
-
-
+  </div>
+<script src="/assets/js/nav-auth.js"></script>
 </body>
-
 </html>

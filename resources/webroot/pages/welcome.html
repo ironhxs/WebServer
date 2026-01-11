@@ -1,107 +1,36 @@
-<!DOCTYPE html>
-<html lang="zh">
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebServer</title>
-    <style>
-        /* 重置一些默认样式 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: #333;
-        }
-
-        .container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 500px;
-            width: 100%;
-        }
-
-        h1 {
-            font-size: 28px;
-            color: #3498db;
-            margin-bottom: 30px;
-        }
-
-        button {
-            background-color: #3498db;
-            color: white;
-            font-size: 16px;
-            padding: 12px 20px;
-            width: 100%;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-bottom: 15px;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        form {
-            margin-bottom: 20px;
-        }
-
-        .footer-text {
-            font-size: 14px;
-            color: #777;
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="icon" href="/assets/media/favicon.ico">
+    <link rel="stylesheet" href="/assets/css/site.css">
+    <title>WebServer | 欢迎</title>
 </head>
 <body>
-
-    <div class="container">
-        <h1><strong>是时候做出选择了</strong></h1>
-
-        <!-- 各种按钮 -->
-        <form action="5" method="post">
-            <button type="submit">工大欢迎您！</button>
-        </form>
-        
-        <form action="6" method="post">
-            <button type="submit">工大风光video</button>
-        </form>
-
-        <form action="8" method="post">
-            <button type="submit">前端演示</button>
-        </form>
-
-        <form action="9" method="post">
-            <button type="submit">访问nonexistent.html</button>
-        </form>
-
-        <form action="p" method="post">
-            <button type="submit">访问.php</button>
-        </form>
-
-        <form action="7" method="post">
-            <button type="submit">作品信息</button>
-        </form>
-
-        <!-- 页脚文本 -->
-        <div class="footer-text">
-            <p>请选择您想要访问的内容。</p>
-        </div>
+<div class="page">
+<div class="nav">
+    <div class="brand">WebServer 实验站</div>
+    <div class="nav-links">
+        <a href="/">首页</a>
+        <a href="/uploads/list">我的上传</a>
+        <a href="/pages/status.html">监控</a>
     </div>
+    <div class="nav-auth">
+        <a class="btn ghost" href="/pages/log.html">登录</a>
+        <a class="btn primary" href="/pages/register.html">注册</a>
+    </div>
+</div>
+<section class="panel" style="max-width: 560px; margin: 0 auto; text-align: center;">
+    <h2 style="font-size: 24px;">登录成功</h2>
+    <p style="color: var(--muted); margin-top: 8px;">欢迎进入系统，请选择下一步操作。</p>
+    <div class="actions" style="justify-content: center;">
+        <a class="btn primary" href="/uploads/list">我的上传</a>
+        <a class="btn ghost" href="/pages/upload.html">上传文件</a>
+    </div>
+</section>
 
+</div>
+<script src="/assets/js/nav-auth.js"></script>
 </body>
 </html>

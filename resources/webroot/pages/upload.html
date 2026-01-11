@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/media/favicon.ico">
+    <link rel="stylesheet" href="/assets/css/site.css">
+    <title>WebServer | 上传</title>
+</head>
+<body>
+<div class="page">
+<div class="nav">
+    <div class="brand">WebServer 实验站</div>
+    <div class="nav-links">
+        <a href="/">首页</a>
+        <a href="/uploads/list">我的上传</a>
+        <a href="/pages/status.html">监控</a>
+    </div>
+    <div class="nav-auth">
+        <a class="btn ghost" href="/pages/log.html">登录</a>
+        <a class="btn primary" href="/pages/register.html">注册</a>
+    </div>
+</div>
+<section class="panel" style="max-width: 720px; margin: 0 auto;">
+    <h2 style="font-size: 26px;">文件上传</h2>
+    <p style="color: var(--muted); margin-top: 10px;">支持上传图片或文档，用于展示 HTTP 文件传输能力（建议小于 2MB）。</p>
+    <form class="form" action="/upload" method="post" enctype="multipart/form-data">
+        <div class="field">
+            <label>选择文件</label>
+            <input type="file" name="file" required>
+        </div>
+        <div class="actions">
+            <button class="btn primary" type="submit">上传文件</button>
+            <a class="btn ghost" href="/uploads/list">我的上传</a>
+        </div>
+    </form>
+    <div class="footer">上传文件将保存到 /uploads/ 目录。</div>
+</section>
+</div>
+<script src="/assets/js/nav-auth.js"></script>
+</body>
+</html>
