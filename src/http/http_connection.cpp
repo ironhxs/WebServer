@@ -8,7 +8,7 @@
 #include <sstream>
 #include <vector>
 
-static const long kMaxBodySize = 2 * 1024 * 1024;
+static const long kMaxBodySize = 20 * 1024 * 1024;
 
 // HTTP status strings.
 const char *ok_200_title = "OK";
@@ -68,6 +68,11 @@ std::string url_decode(const std::string &value)
     out.reserve(value.size());
     for (size_t i = 0; i < value.size(); ++i)
     {
+        if (value[i] == '+')
+        {
+            out.push_back(' ');
+            continue;
+        }
         if (value[i] == '%' && i + 2 < value.size())
         {
             int hi = hex_value(value[i + 1]);
@@ -82,6 +87,18 @@ std::string url_decode(const std::string &value)
         out.push_back(value[i]);
     }
     return out;
+}
+
+std::string get_form_value(const std::string &body, const std::string &key)
+{
+    std::string pattern = key + "=";
+    size_t pos = body.find(pattern);
+    if (pos == std::string::npos)
+        return "";
+    size_t start = pos + pattern.size();
+    size_t end = body.find('&', start);
+    std::string raw = body.substr(start, end == std::string::npos ? std::string::npos : end - start);
+    return url_decode(raw);
 }
 
 std::string extract_forwarded_ip(const std::string &value)
@@ -633,7 +650,7 @@ http_conn::HTTP_CODE http_conn::parse_headers(char *text)
 <p style="margin-top: 8px; color: var(--muted);">&#x8bf7;&#x6c42;&#x4f53;&#x8d85;&#x8fc7;&#x670d;&#x52a1;&#x5668;&#x9650;&#x5236;&#xff0c;&#x8bf7;&#x7f29;&#x5c0f;&#x6587;&#x4ef6;&#x540e;&#x518d;&#x8bd5;&#x3002;</p>
 <div class="actions" style="margin-top: 16px;">
 <a class="btn primary" href="/pages/upload.html">&#x8fd4;&#x56de;&#x4e0a;&#x4f20;</a>
-<a class="btn ghost" href="/uploads/list">&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
+
 </div>
 </section>)HTML");
             return DYNAMIC_REQUEST;
@@ -867,7 +884,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
              << R"HTML(</p>
 <div class="actions" style="margin-top: 16px;">
 <a class="btn primary" href="/pages/upload.html">&#x8fd4;&#x56de;&#x4e0a;&#x4f20;</a>
-<a class="btn ghost" href="/uploads/list">&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
+
 </div>
 </section>)HTML";
         m_response_status = 400;
@@ -977,7 +994,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
 <div class="actions" style="margin-top: 20px;">
 <a class="btn primary" href=")HTML" << file_url << R"HTML(">&#x7acb;&#x5373;&#x67e5;&#x770b;</a>
 <a class="btn ghost" href="/pages/upload.html">&#x7ee7;&#x7eed;&#x4e0a;&#x4f20;</a>
-<a class="btn ghost" href="/uploads/list">&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
+
 </div>
 </section>)HTML";
 
@@ -1034,7 +1051,12 @@ http_conn::HTTP_CODE http_conn::handle_upload_list()
 
                  << R"HTML(</p><p>&#x6587;&#x4ef6;&#x5927;&#x5c0f;&#xff1a;)HTML" << item.size << R"HTML( &#x5b57;&#x8282;</p>
 
-<a href=")HTML" << url << R"HTML(" class="btn ghost" style="margin-top: 12px; display: inline-flex;">&#x67e5;&#x770b;</a></div>)HTML";
+<a href=")HTML" << url << R"HTML(" class="btn ghost" style="margin-top: 12px; display: inline-flex;">&#x67e5;&#x770b;</a>
+
+<form action="/uploads/delete" method="post" style="margin-top: 10px;">
+<input type="hidden" name="file" value=")HTML" << html_escape(item.stored_name) << R"HTML(">
+<button class="btn ghost" type="submit">&#x5220;&#x9664;</button>
+</form></div>)HTML";
 
         }
         body << R"HTML(</div>)HTML";
@@ -1042,7 +1064,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_list()
 
     body << R"HTML(<div class="actions" style="margin-top: 20px;">
 <a class="btn primary" href="/pages/upload.html">&#x7ee7;&#x7eed;&#x4e0a;&#x4f20;</a>
-<a class="btn ghost" href="/uploads/list">&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
+
 </div>
 </section>)HTML";
 
@@ -1052,6 +1074,133 @@ http_conn::HTTP_CODE http_conn::handle_upload_list()
     return DYNAMIC_REQUEST;
 }
 
+http_conn::HTTP_CODE http_conn::handle_upload_delete()
+{
+
+    auto fail = [&](const std::string &message, int status) {
+
+        std::ostringstream body;
+
+        body << R"HTML(<section class="panel" style="max-width: 620px; margin: 0 auto;">
+
+<h2 style="font-size: 24px;">&#x5220;&#x9664;&#x5931;&#x8d25;</h2>
+
+<p style="margin-top: 8px; color: var(--muted);">)HTML"
+
+             << message
+
+             << R"HTML(</p>
+
+<div class="actions" style="margin-top: 16px;">
+
+<a class="btn primary" href="/uploads/list">&#x8fd4;&#x56de;&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
+
+<a class="btn ghost" href="/pages/upload.html">&#x4e0a;&#x4f20;&#x6587;&#x4ef6;</a>
+
+</div>
+
+</section>)HTML";
+
+        m_response_status = status;
+
+        m_dynamic_content_type = "text/html; charset=utf-8";
+
+        m_dynamic_content = build_page_shell("&#x5220;&#x9664;&#x5931;&#x8d25;", body.str());
+
+        return DYNAMIC_REQUEST;
+
+    };
+
+    if (m_method != POST)
+
+        return fail("&#x5f53;&#x524d;&#x8bf7;&#x6c42;&#x65b9;&#x6cd5;&#x4e0d;&#x652f;&#x6301;&#x5220;&#x9664;&#x3002;", 400);
+
+    if (m_username.empty())
+
+        return fail("&#x672a;&#x68c0;&#x6d4b;&#x5230;&#x767b;&#x5f55;&#x7528;&#x6237;&#x3002;", 400);
+
+    if (!m_string || m_content_length <= 0)
+
+        return fail("&#x672a;&#x68c0;&#x6d4b;&#x5230;&#x6709;&#x6548;&#x7684;&#x5220;&#x9664;&#x8bf7;&#x6c42;&#x3002;", 400);
+
+    std::string payload(m_string, static_cast<size_t>(m_content_length));
+    std::string stored = get_form_value(payload, "file");
+    if (stored.empty())
+        stored = get_form_value(payload, "stored");
+    if (stored.empty())
+        return fail("&#x672a;&#x627e;&#x5230;&#x8981;&#x5220;&#x9664;&#x7684;&#x6587;&#x4ef6;&#x3002;", 400);
+    if (stored.find("..") != std::string::npos || stored.find('/') != std::string::npos || stored.find('\\') != std::string::npos)
+        return fail("&#x6587;&#x4ef6;&#x540d;&#x4e0d;&#x5408;&#x6cd5;&#x3002;", 400);
+    if (!user_owns_upload(m_username, stored))
+        return fail("&#x6ca1;&#x6709;&#x6743;&#x9650;&#x5220;&#x9664;&#x8be5;&#x6587;&#x4ef6;&#x3002;", 404);
+
+    std::string file_path = std::string(doc_root) + "/uploads/" + stored;
+    if (::remove(file_path.c_str()) != 0 && errno != ENOENT)
+        return fail("&#x5220;&#x9664;&#x6587;&#x4ef6;&#x5931;&#x8d25;&#x3002;", 500);
+
+    std::string meta_path = std::string(doc_root) + "/uploads/.meta/" + m_username + ".list";
+    std::ifstream in(meta_path);
+    if (!in)
+        return fail("&#x672a;&#x627e;&#x5230;&#x4e0a;&#x4f20;&#x8bb0;&#x5f55;&#x3002;", 404);
+    std::string tmp_path = meta_path + ".tmp";
+    std::ofstream out(tmp_path, std::ios::trunc);
+    if (!out)
+        return fail("&#x65e0;&#x6cd5;&#x66f4;&#x65b0;&#x4e0a;&#x4f20;&#x8bb0;&#x5f55;&#x3002;", 500);
+    std::string line;
+    bool removed = false;
+    while (std::getline(in, line))
+    {
+        if (line.empty())
+            continue;
+        std::stringstream ss(line);
+        std::string stored_name;
+        if (!std::getline(ss, stored_name, '|'))
+            continue;
+        if (stored_name == stored)
+        {
+            removed = true;
+            continue;
+        }
+        out << line << "\n";
+    }
+    in.close();
+    out.close();
+    if (!removed)
+    {
+        ::remove(tmp_path.c_str());
+        return fail("&#x672a;&#x627e;&#x5230;&#x8981;&#x5220;&#x9664;&#x7684;&#x8bb0;&#x5f55;&#x3002;", 404);
+    }
+    if (::rename(tmp_path.c_str(), meta_path.c_str()) != 0)
+        return fail("&#x66f4;&#x65b0;&#x8bb0;&#x5f55;&#x5931;&#x8d25;&#x3002;", 500);
+
+    std::ostringstream body;
+    body << R"HTML(<section class="panel" style="max-width: 620px; margin: 0 auto;">
+
+<h2 style="font-size: 24px;">&#x5220;&#x9664;&#x6210;&#x529f;</h2>
+
+<p style="margin-top: 8px; color: var(--muted);">&#x6587;&#x4ef6;&#x5df2;&#x5220;&#x9664;&#x3002;</p>
+
+<div class="actions" style="margin-top: 16px;">
+
+<a class="btn primary" href="/uploads/list">&#x8fd4;&#x56de;&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
+
+<a class="btn ghost" href="/pages/upload.html">&#x4e0a;&#x4f20;&#x6587;&#x4ef6;</a>
+
+</div>
+
+</section>)HTML";
+
+    m_response_status = 200;
+
+    m_dynamic_content_type = "text/html; charset=utf-8";
+
+    m_dynamic_content = build_page_shell("&#x5220;&#x9664;&#x6210;&#x529f;", body.str());
+
+    return DYNAMIC_REQUEST;
+
+}
+
+
 bool http_conn::user_owns_upload(const std::string &owner, const std::string &stored_name) const
 {
     std::vector<UploadItem> items;
@@ -1101,8 +1250,8 @@ http_conn::HTTP_CODE http_conn::handle_user_gallery_page()
 
     body << R"HTML(<div class="actions" style="margin-top: 20px;">
 <a class="btn primary" href="/pages/upload.html">&#x4e0a;&#x4f20;&#x4e2d;&#x5fc3;</a>
-<a class="btn ghost" href="/uploads/list">&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
-<a class="btn ghost" href="/uploads/list">&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
+
+
 </div>
 </section>)HTML";
 
@@ -1147,8 +1296,8 @@ http_conn::HTTP_CODE http_conn::handle_user_video_page()
 
     body << R"HTML(<div class="actions" style="margin-top: 20px;">
 <a class="btn primary" href="/pages/upload.html">&#x4e0a;&#x4f20;&#x4e2d;&#x5fc3;</a>
-<a class="btn ghost" href="/uploads/list">&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
-<a class="btn ghost" href="/uploads/list">&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
+
+
 </div>
 </section>)HTML";
 
@@ -1302,7 +1451,7 @@ http_conn::HTTP_CODE http_conn::do_request()
                 m_username = name;
                 m_extra_headers += "Set-Cookie: ws_user=";
                 m_extra_headers += name;
-                m_extra_headers += "; Path=/; HttpOnly\r\n";
+                m_extra_headers += "; Path=/\r\n";
                 url = "/pages/welcome.html";
             }
             else
@@ -1325,7 +1474,7 @@ http_conn::HTTP_CODE http_conn::do_request()
 <p style="margin-top: 8px; color: var(--muted);">&#x4f60;&#x5df2;&#x5b89;&#x5168;&#x9000;&#x51fa;&#xff0c;&#x53ef;&#x4ee5;&#x91cd;&#x65b0;&#x767b;&#x5f55;&#x3002;</p>
 <div class="actions" style="margin-top: 16px;">
 <a class="btn primary" href="/pages/log.html">&#x524d;&#x5f80;&#x767b;&#x5f55;</a>
-<a class="btn ghost" href="/uploads/list">&#x6211;&#x7684;&#x4e0a;&#x4f20;</a>
+
 </div>
 </section>)HTML");
         return DYNAMIC_REQUEST;
@@ -1347,6 +1496,16 @@ http_conn::HTTP_CODE http_conn::do_request()
         url = "/pages/upload.html";
     }
 
+    if (url == "/uploads/delete")
+    {
+
+        if (!logged_in)
+
+            return redirect_login();
+
+        return handle_upload_delete();
+
+    }
     if (url == "/uploads/list")
     {
         if (!logged_in)

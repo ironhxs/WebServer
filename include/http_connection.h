@@ -108,6 +108,7 @@ private:
     HTTP_CODE handle_welcome_page();
     HTTP_CODE handle_upload_request();
     HTTP_CODE handle_upload_list();
+    HTTP_CODE handle_upload_delete();
     bool user_owns_upload(const std::string &owner, const std::string &stored_name) const;
     HTTP_CODE handle_user_gallery_page();
     HTTP_CODE handle_user_video_page();
