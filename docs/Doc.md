@@ -22,9 +22,7 @@
 
 - [项目结构](PROJECT_STRUCTURE.md) - 详细的项目目录说明
 
-- [代码注释](CODE_COMMENTS.md) - 代码注释文档索引
-
-- [优化总结](OPTIMIZATION_SUMMARY.md) - 项目优化详细报告
+- [文档索引](INDEX.md) - 文档中心与手册使用说明
 
 - [模块说明](#模块详解) - 各模块技术细节
 
@@ -46,7 +44,13 @@
 
 - **异步日志系统**：支持同步/异步日志记录，保证高性能
 
-- **定时器管理**：非活动连接自动断开，防止资源浪费
+- **定时器管理**：非活动连接 90 秒超时自动断开，防止资源浪费
+
+- **文件上传**：支持 multipart/form-data 大文件上传
+
+- **状态监控**：实时在线用户数、连接数、历史访客统计
+
+- **Cloudflare 支持**：自动识别 CF-Connecting-IP 获取真实访客 IP
 
 - **HTTP 协议支持**：完整的 HTTP 请求解析与响应
 
@@ -740,9 +744,9 @@ OPT_LINGER = 1;
 
 
 
-- 项目地址：https://github.com/your-repo/WebServer
+- 项目地址：https://github.com/ironhxs/WebServer
 
-- 问题反馈：https://github.com/your-repo/WebServer/issues
+- 问题反馈：https://github.com/ironhxs/WebServer/issues
 
 
 
@@ -759,7 +763,7 @@ OPT_LINGER = 1;
 - **登录**：http://localhost:9006/pages/log.html
 - **注册**：http://localhost:9006/pages/register.html
 - **上传文件**：http://localhost:9006/pages/upload.html
-- **我的上传**：http://localhost:9006/uploads/list（图集和视频已合并）
+- **我的上传**：http://localhost:9006/uploads/list
 - **监控页面**：http://localhost:9006/pages/status.html
 - **PHP 示例**：http://localhost:9006/phpinfo.php
 

@@ -12,49 +12,49 @@
 
 # 赋予脚本执行权限（首次使用）
 
-chmod +x manage.sh
+chmod +x scripts/manage.sh
 
 
 
 # 启动服务器
 
-./manage.sh start
+./scripts/manage.sh start
 
 
 
 # 停止服务器
 
-./manage.sh stop
+./scripts/manage.sh stop
 
 
 
 # 重启服务器
 
-./manage.sh restart
+./scripts/manage.sh restart
 
 
 
 # 查看状态
 
-./manage.sh status
+./scripts/manage.sh status
 
 
 
 # 查看日志
 
-./manage.sh log
+./scripts/manage.sh log
 
 
 
 # 实时日志
 
-./manage.sh tail
+./scripts/manage.sh tail
 
 
 
 # 重新编译
 
-./manage.sh build
+./scripts/manage.sh build
 
 ```
 
@@ -74,7 +74,7 @@ make
 
 # 启动（前台运行）
 
-./server -p 9006
+./bin/webserver -p 9006
 
 
 
@@ -187,99 +187,7 @@ tail -f server.log
 
 
 
-## 常见问题
 
-
-
-### 1. 端口被占用
-
-```bash
-
-# 查看端口占用
-
-sudo lsof -i :9006
-
-
-
-# 杀死进程
-
-kill -9 <PID>
-
-
-
-# 或使用脚本停止
-
-./manage.sh stop
-
-```
-
-
-
-### 2. MySQL 连接失败
-
-```bash
-
-# 启动 MySQL
-
-sudo service mysql start
-
-
-
-# 检查数据库是否存在
-
-sudo mysql -e "SHOW DATABASES;"
-
-
-
-# 重新创建数据库
-
-sudo mysql < setup_db.sql
-
-```
-
-
-
-### 3. 编译错误
-
-```bash
-
-# 安装依赖
-
-sudo apt-get install -y libmysqlclient-dev
-
-
-
-# 清理后重新编译
-
-make clean
-
-make
-
-```
-
-
-
-### 4. 无法访问网站
-
-```bash
-
-# 检查服务器是否运行
-
-./manage.sh status
-
-
-
-# 检查防火墙
-
-sudo ufw allow 9006
-
-
-
-# 查看错误日志
-
-tail -f server.log
-
-```
 
 
 
@@ -494,9 +402,9 @@ tail -f server.log
 
 
 
-- **问题反馈**：[GitHub Issues](your-repo-url/issues)
+- **问题反馈**：[GitHub Issues](https://github.com/ironhxs/WebServer/issues)
 
-- **邮箱**：your.email@example.com
+- **邮箱**：ironhxs@gmail.com
 
 
 
@@ -508,7 +416,7 @@ tail -f server.log
 
 ## 扩展功能说明
 
-- 上传功能使用 `multipart/form-data`，上传入口：`/pages/upload.html`（建议小于 2MB），上传记录：`/uploads/list`。
+- 上传功能使用 `multipart/form-data`，上传入口：`/pages/upload.html`，上传记录：`/uploads/list`。
 - 运行监控页面通过 `/status.json` 提供实时数据（含平均 QPS），入口：`/pages/status.html`。
 - PHP 动态解析示例：`/phpinfo.php`。
 
@@ -524,7 +432,7 @@ cloudflared tunnel --url http://localhost:9006 --protocol http2
 # If QUIC times out, keep --protocol http2 (TCP). Quick Tunnel does not need cert.
 ```
 
-将输出的公网地址分享给他人即可访问你的服务。
+将输出的公网地址分享给他人即可访问服务。
 
 ### 内网穿透（Ngrok 可选）
 
@@ -536,7 +444,7 @@ ngrok config add-authtoken <YOUR_TOKEN>
 ngrok http 9006
 ```
 
-## 功能测试建议
+## 功能测试
 
 ```bash
 # 监控接口
@@ -564,5 +472,3 @@ curl http://localhost:9006/phpinfo.php
 ```bash
 ./scripts/run_webbench.sh http://localhost:9006/ 10000 10
 ```
-
-- 图集与视频为公共示例资源，需登录后访问。

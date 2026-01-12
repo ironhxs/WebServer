@@ -1,689 +1,233 @@
-# WebServer - 高性能C++服务器
-
-
-
-![C++](https://img.shields.io/badge/C++-11-blue.svg)
-
-![MySQL](https://img.shields.io/badge/MySQL-8.0-orange.svg)
-
-![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
-
-
-
-基于 C++11 实现的企业级高性能 Web 服务器，采用 Epoll + 线程池 + 数据库连接池 + 异步日志架构。
-
-
-
-## 快速开始
-
-
-
-```bash
-
-# 1. 安装依赖
-
-make install-deps
-
-
-
-# 2. 初始化数据库
-
-mysql -u root -p < config/setup_db.sql
-
-
-
-# 3. 编译运行
-
-make
-
-make start
-
-
-
-# 4. 访问测试
-
-curl http://localhost:9006/
-
-```
-
-
-
-## 完整文档
-
-
-
-详细文档请查看 **[docs/README.md](docs/README.md)**
-
-
-
-## 核心特性
-
-
-
-- **Epoll + 线程池**：支持 10000+ 并发连接
-
-- **Reactor/Proactor**：双并发模型支持
-
-- **数据库连接池**：高效的 MySQL 连接管理
-
-- **异步日志系统**：非阻塞日志记录
-
-- **定时器管理**：自动清理超时连接
-
-- **HTTP/1.1**：完整协议支持，Keep-Alive 长连接
-
-- **状态监控页**：运行时统计与状态 JSON 输出
-
-- **文件上传**：multipart/form-data 文件上传与存储
-
-- **PHP 动态解析**：支持 PHP 页面解析输出
-
-
-
-## 项目结构
-
-
-
-```
-
-WebServer/
-
-├── include/                    # 头文件
-
-│   ├── webserver.h            # 服务器核心
-
-│   ├── config.h               # 配置管理
-
-│   ├── http_conn.h            # HTTP连接处理
-
-│   ├── log.h                  # 日志系统
-
-│   ├── threadpool.h           # 线程池
-
-│   ├── sql_connection_pool.h  # 数据库连接池
-
-│   ├── lst_timer.h            # 定时器
-
-│   ├── locker.h               # 同步机制
-
-│   └── block_queue.h          # 阻塞队列
-
-│
-
-├── src/                       # 源文件
-
-│   ├── core/                  # 核心模块
-
-│   │   ├── main.cpp           # 程序入口
-
-│   │   ├── webserver.cpp      # 服务器实现
-
-│   │   └── config.cpp         # 配置实现
-
-│   ├── http/                  # HTTP模块
-
-│   │   └── http_conn.cpp
-
-│   ├── log/                   # 日志模块
-
-│   │   └── log.cpp
-
-│   ├── timer/                 # 定时器模块
-
-│   │   └── lst_timer.cpp
-
-│   └── database/              # 数据库模块
-
-│       └── sql_connection_pool.cpp
-
-│
-
-├── build/                     # 构建输出（自动生成）
-
-│   ├── obj/                   # 目标文件
-
-│   └── deps/                  # 依赖文件
-
-│
-
-├── bin/                       # 可执行文件（自动生成）
-
-│   └── webserver
-
-│
-
-├── config/                    # 配置文件
-
-│   ├── setup_db.sql           # 数据库初始化
-
-│   └── server.conf.example    # 配置模板
-
-│
-
-├── scripts/                   # 脚本工具
-
-│   └── manage.sh              # 服务器管理脚本
-
-│
-
-├── resources/                 # 资源文件
-
-│   └── webroot/               # 网站根目录
-
-│       ├── index.html
-
-│       └── ...
-
-│
-
-├── tests/                     # 测试
-
-│   └── benchmark/             # 性能测试
-
-│       └── webbench-1.5/      # Webbench工具
-
-│
-
-├── docs/                      # 文档
-
-│   ├── README.md              # 完整文档
-
-│   ├── QUICKSTART.md          # 快速开始
-
-│   └── ...
-
-│
-
-├── Makefile                   # 构建系统
-
-├── .gitignore                 # Git忽略规则
-
-└── README.md                  # 本文件
-
-```
-
-
-
-## 常用命令
-
-
-
-### 编译
-
-```bash
-
-make              # Debug 模式
-
-make DEBUG=0      # Release 模式
-
-make clean        # 清理
-
-make rebuild      # 重新构建
-
-```
-
-
-
-### 运行
-
-```bash
-
-make run          # 前台运行
-
-make start        # 后台启动
-
-make stop         # 停止服务
-
-make status       # 查看状态
-
-```
-
-
-
-### 测试
-
-```bash
-
-make test         # 性能测试（需要服务器运行）
-
-```
-
-
-
-### 自定义参数
-
-```bash
-
-./bin/webserver -p 8080 -l 1 -m 3 -t 16
-
-
-
-  -p <port>   端口号（默认9006）
-
-  -l <mode>   日志：0=同步 1=异步
-
-  -m <mode>   触发：0=LT+LT 1=LT+ET 2=ET+LT 3=ET+ET
-
-  -t <num>    线程数（默认8）
-
-  -s <num>    数据库连接数（默认8）
-
-  -a <model>  模型：0=Proactor 1=Reactor
-
-```
-
-
-
-## 性能指标
-
-
-
-```bash
-
-# Webbench 压力测试结果
-
-并发：10000 clients
-
-时长：10 seconds
-
-成功率：100%
-
-QPS：~50000 requests/sec
-
-```
-
-
-
-## 技术栈
-
-
-
-- **C++11**：核心语言
-
-- **Epoll**：I/O 多路复用（ET/LT）
-
-- **线程池**：Reactor/Proactor 模式
-
-- **MySQL**：数据库 + 连接池
-
-- **异步日志**：队列 + 后台线程
-
-- **HTTP/1.1**：完整协议实现
-
-
-
-## 配置数据库
-
-
-
-编辑 `src/core/webserver.cpp`：
-
-```cpp
-
-user = "root";
-
-passwd = "your_password";
-
-databasename = "hxsdb";
-
-```
-
-
-
-## 开发计划
-
-
-
-- [ ] HTTPS 支持
-
-- [ ] HTTP/2.0
-
-- [ ] WebSocket
-
-- [ ] 配置文件解析
-
-- [ ] Docker 容器化
-
-
-
-## 许可证
-
-
-
-MIT License
-
-
+<p align="center">
+  <img src="https://img.shields.io/badge/C++-11-00599C?style=for-the-badge&logo=cplusplus&logoColor=white" alt="C++11">
+  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
+  <img src="https://img.shields.io/badge/Linux-Epoll-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
+</p>
+
+<h1 align="center">🚀 WebServer</h1>
+
+<p align="center">
+  <b>高性能 C++11 Web 服务器</b><br>
+  基于 Epoll + 线程池 + 连接池 + 异步日志架构，支持 10000+ 并发连接
+</p>
+
+<p align="center">
+  <a href="docs/README.md">📖 完整文档</a> •
+  <a href="docs/QUICKSTART.md">⚡ 快速开始</a> •
+  <a href="#性能测试">📊 性能测试</a> •
+  <a href="#功能特性">✨ 功能特性</a>
+</p>
 
 ---
 
+## ✨ 功能特性
 
+| 核心功能 | 描述 |
+|---------|------|
+| 🔥 **高并发处理** | Epoll I/O 多路复用 + 线程池，支持 10000+ 并发 |
+| 🗄️ **数据库连接池** | MySQL 连接复用，用户登录/注册系统 |
+| 📝 **异步日志** | 同步/异步双模式，高性能日志记录 |
+| ⏱️ **定时器管理** | 自动清理 90 秒超时的非活动连接 |
+| 📤 **文件上传** | multipart/form-data 大文件上传支持 |
+| 📊 **状态监控** | 实时在线用户数、连接数、访客统计 |
+| 🐘 **PHP 支持** | PHP-CGI 动态页面解析 |
+| 🌐 **Cloudflare 支持** | 自动识别 CF-Connecting-IP 真实 IP |
 
-**完整文档**：[docs/README.md](docs/README.md)
+### 技术亮点
 
+- **双并发模型**：Reactor / Proactor 模式可切换
+- **触发模式**：ET / LT 边缘/水平触发可选
+- **零拷贝**：mmap 内存映射加速文件传输
+- **优雅关闭**：SO_LINGER 选项支持
+- **内网穿透**：Cloudflare Tunnel 一键配置
 
+---
 
+## 🚀 快速开始
 
-
-## 快速开始
-
-
+### 1️⃣ 安装依赖
 
 ```bash
+# Ubuntu / Debian / WSL
+sudo apt-get update
+sudo apt-get install -y build-essential libmysqlclient-dev mysql-server php-cgi
+```
 
-# 1. 安装依赖
+### 2️⃣ 初始化数据库
 
-sudo apt-get install -y build-essential libmysqlclient-dev mysql-server
+```bash
+mysql -u root -p < config/setup_db.sql
+```
 
+### 3️⃣ 编译运行
 
+```bash
+make                        # 编译
+./scripts/manage.sh start   # 启动
+```
 
-# 2. 初始化数据库
+### 4️⃣ 访问测试
 
-mysql -u root -p < docs/setup_db.sql
-
-
-
-# 3. 编译运行
-
-make
-
-./manage.sh start
-
-
-
-# 4. 访问测试
-
+```bash
 curl http://localhost:9006/
-
 ```
 
+🎉 **打开浏览器访问** http://localhost:9006
 
+---
 
-## 完整文档
-
-
-
-详细文档请查看 **[docs/README.md](docs/README.md)**
-
-
-
-- [快速开始指南](docs/QUICKSTART.md) - 5分钟上手教程
-
-- [项目结构说明](docs/PROJECT_STRUCTURE.md) - 目录结构详解
-
-
-
-## 核心特性
-
-
-
-- **Epoll + 线程池**：高并发请求处理（支持10000+并发）
-
-- **Reactor/Proactor**：双并发模型支持
-
-- **数据库连接池**：MySQL连接复用，减少开销
-
-- **异步日志系统**：高性能日志记录
-
-- **定时器管理**：自动清理超时连接
-
-- **HTTP/1.1**：完整协议支持，Keep-Alive长连接
-
-
-
-## 常用命令
-
-
-
-### 编译
-
-```bash
-
-make              # Debug模式编译
-
-make DEBUG=0      # Release模式编译
-
-make clean        # 清理
-
-make rebuild      # 重新构建
-
-make help         # 查看所有命令
+## 📁 项目结构
 
 ```
-
-
-
-### 服务器管理
-
-```bash
-
-./manage.sh start     # 启动
-
-./manage.sh stop      # 停止
-
-./manage.sh restart   # 重启
-
-./manage.sh status    # 状态
-
-./manage.sh log       # 查看日志
-
-```
-
-
-
-### 自定义参数
-
-```bash
-
-./server -p 8080 -l 1 -m 3 -t 16
-
-
-
-参数说明：
-
-  -p  端口号（默认9006）
-
-  -l  日志模式：0=同步 1=异步
-
-  -m  触发模式：0=LT+LT 1=LT+ET 2=ET+LT 3=ET+ET
-
-  -t  线程数（默认8）
-
-  -s  数据库连接数（默认8）
-
-  -a  并发模型：0=Proactor 1=Reactor
-
-```
-
-
-
-## 性能测试
-
-
-
-```bash
-
-# Webbench 压力测试
-
-cd tests/benchmark/webbench-1.5
-
-make
-
-./webbench -c 10000 -t 10 http://localhost:9006/
-
-```
-
-
-
-**测试结果示例：**
-
-- 并发：10000 clients
-
-- 时长：10 seconds
-
-- 成功率：100%
-
-- QPS：~50000 requests/sec
-
-
-
-## 项目结构
-
-
-
-```
-
 WebServer/
-
-├── docs/                    #  完整文档
-
-├── main.cpp                 # 程序入口
-
-├── webserver.h/cpp          # 服务器核心
-
-├── config.h/cpp             # 配置管理
-
-├── threadpool/              # 线程池
-
-├── http/                    # HTTP处理
-
-├── log/                     # 日志系统
-
-├── CGImysql/                # 数据库连接池
-
-├── timer/                   # 定时器
-
-├── lock/                    # 同步机制
-
-├── resources/webroot/                    # 网站根目录
-
-├── makefile                 # 构建系统
-
-└── manage.sh                # 管理脚本
-
+├── 📂 src/                    # 源代码
+│   ├── core/                  #   ├── 核心模块 (main, webserver, config)
+│   ├── http/                  #   ├── HTTP 请求处理
+│   ├── database/              #   ├── 数据库连接池
+│   ├── log/                   #   └── 异步日志系统
+│   └── timer/                 #       定时器管理
+│
+├── 📂 include/                # 头文件
+├── 📂 resources/webroot/      # 网站根目录
+├── 📂 scripts/                # 管理脚本
+├── 📂 config/                 # 配置文件
+├── 📂 tests/benchmark/        # 压力测试工具
+├── 📂 docs/                   # 文档
+└── 📄 Makefile                # 构建系统
 ```
 
+---
 
-
-## 技术栈
-
-
-
-- **语言**：C++11
-
-- **I/O多路复用**：Epoll (ET/LT)
-
-- **并发**：线程池 + Reactor/Proactor
-
-- **数据库**：MySQL 8.0 + 连接池
-
-- **日志**：异步日志系统
-
-- **协议**：HTTP/1.1
-
-
-
-## 系统要求
-
-
-
-- Linux / WSL（Ubuntu 20.04+）
-
-- g++ 7.0+ （支持C++11）
-
-- MySQL 8.0+
-
-
-
-## 配置数据库
-
-
-
-默认配置（可在 `webserver.cpp` 中修改）：
-
-```cpp
-
-user = "root";
-
-passwd = "";           // 改为你的MySQL密码
-
-databasename = "hxsdb";
-
-```
-
-
-
-## 故障排查
-
-
-
-**端口占用：**
+## ⚙️ 命令行参数
 
 ```bash
-
-lsof -i :9006              # 查看占用
-
-./server -p 8080           # 换端口
-
+./bin/webserver [选项]
 ```
 
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `-p <port>` | 监听端口 | 9006 |
+| `-l <0\|1>` | 日志模式：0=同步, 1=异步 | 0 |
+| `-m <0-3>` | 触发模式：0=LT+LT, 3=ET+ET | 0 |
+| `-t <num>` | 线程池大小 | 8 |
+| `-s <num>` | 数据库连接数 | 8 |
+| `-a <0\|1>` | 并发模型：0=Proactor, 1=Reactor | 0 |
+| `-o <0\|1>` | 优雅关闭 | 0 |
 
-
-**MySQL连接失败：**
+### 配置示例
 
 ```bash
+# 🔧 开发模式
+./bin/webserver -p 9006 -l 0 -t 4
 
-sudo systemctl start mysql  # 启动MySQL
+# 🚀 高性能模式
+./bin/webserver -p 80 -l 1 -m 3 -t 16 -a 0
 
-mysql -u root -p            # 测试连接
-
+# 📈 压力测试模式
+./bin/webserver -p 9006 -l 1 -m 3 -c 1 -t 32
 ```
 
+---
 
+## 📊 性能测试
 
-**编译错误：**
+使用 Webbench 压力测试：
 
 ```bash
-
-make clean && make          # 清理重编译
-
-make deps                   # 安装依赖
-
+# 编译并运行测试
+./scripts/run_webbench.sh http://localhost:9006/ 10000 10
 ```
 
+### 测试结果
 
+| 指标 | 数值 |
+|------|------|
+| **并发连接** | 10,000 |
+| **测试时长** | 10 秒 |
+| **成功率** | 100% |
+| **QPS** | ~50,000 req/s |
 
-## 许可证
+---
 
+## 🌐 内网穿透
 
-
-MIT License - 详见 [LICENSE](LICENSE)
-
-
-
-
-## 内网穿透（Cloudflare 推荐）
+支持 Cloudflare Tunnel 一键穿透：
 
 ```bash
-# 安装 cloudflared（Ubuntu/WSL）
+# 安装 cloudflared
 curl -L -o cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
 sudo dpkg -i cloudflared.deb
 
-# 启动 HTTP 穿透
-cloudflared tunnel --url http://localhost:9006 --protocol http2
-# If QUIC times out, keep --protocol http2 (TCP). Quick Tunnel does not need cert.
+# 启动穿透（使用 HTTP/2 避免 QUIC 超时）
+./scripts/tunnel_cloudflared.sh
 ```
 
-## Star History
-
-
-
-如果觉得项目有帮助，欢迎  Star 支持！
-
-
+服务器自动识别 Cloudflare 代理头 `CF-Connecting-IP`，正确显示访客真实 IP。
 
 ---
 
+## 📖 文档
 
+| 文档 | 说明 |
+|------|------|
+| [📚 完整文档](docs/Doc.md) | 详细技术说明 |
+| [⚡ 快速开始](docs/QUICKSTART.md) | 5 分钟上手 |
+| [📁 项目结构](docs/PROJECT_STRUCTURE.md) | 代码结构说明 |
+| [📖 Man Pages](docs/manuals/) | Unix 手册页 |
 
-**完整文档**：[docs/README.md](docs/README.md)
+---
+
+## 🛠️ 技术栈
+
+<table>
+<tr>
+<td align="center"><b>语言</b></td>
+<td align="center"><b>I/O</b></td>
+<td align="center"><b>并发</b></td>
+<td align="center"><b>数据库</b></td>
+<td align="center"><b>协议</b></td>
+</tr>
+<tr>
+<td align="center">C++11</td>
+<td align="center">Epoll ET/LT</td>
+<td align="center">线程池</td>
+<td align="center">MySQL 8.0</td>
+<td align="center">HTTP/1.1</td>
+</tr>
+</table>
+
+---
+
+## 🔧 常用命令
+
+```bash
+# 编译
+make                  # Debug 模式
+make DEBUG=0          # Release 模式
+make clean            # 清理
+make rebuild          # 重新构建
+
+# 服务器管理
+./scripts/manage.sh start     # 启动
+./scripts/manage.sh stop      # 停止
+./scripts/manage.sh restart   # 重启
+./scripts/manage.sh status    # 状态
+./scripts/manage.sh log       # 查看日志
+
+# 压力测试
+make test             # 需要服务器运行中
+```
+
+---
+
+## 📄 许可证
+
+本项目采用 [MIT License](LICENSE) 开源。
+
+---
+
+<p align="center">
+  ⭐ 如果这个项目对你有帮助，欢迎 Star 支持！
+</p>
 
