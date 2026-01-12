@@ -1,21 +1,42 @@
 ﻿<!DOCTYPE html>
+<!--
+  index.html - WebServer 项目首页
+  
+  页面功能:
+  - 展示项目标题和简介
+  - 提供导航链接 (登录/注册/监控)
+  - 显示登录状态 (通过nav-auth.js动态更新)
+  
+  依赖文件:
+  - /assets/css/site.css: 全局样式
+  - /assets/js/nav-auth.js: 登录状态检测
+  
+  与后端交互:
+  - 无直接交互，纯静态展示页
+-->
 <html lang="zh-CN">
 <head>
+  <!-- 字符编码和视口设置 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 网站图标 -->
   <link rel="icon" href="/assets/media/favicon.ico">
+  <!-- 全局CSS样式表 -->
   <link rel="stylesheet" href="/assets/css/site.css">
   <title>WebServer | 实验站</title>
 </head>
 <body>
 <div class="page">
+  <!-- 导航栏 -->
   <div class="nav">
     <div class="brand">WebServer 实验站</div>
+    <!-- 主导航链接 -->
     <div class="nav-links">
       <a href="/">首页</a>
       <a href="/uploads/list">我的上传</a>
       <a href="/pages/status.html">监控</a>
     </div>
+    <!-- 登录/注册按钮区域，由nav-auth.js动态更新 -->
     <div class="nav-auth">
       <a class="btn ghost" href="/pages/log.html">登录</a>
       <a class="btn primary" href="/pages/register.html">注册</a>

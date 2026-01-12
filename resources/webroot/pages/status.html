@@ -1,4 +1,23 @@
 ﻿<!DOCTYPE html>
+<!--
+  status.html - 服务器状态监控页面
+  
+  功能:
+  - 实时显示服务器运行状态
+  - 每2秒自动刷新数据
+  
+  显示指标:
+  - 运行时长: 服务器启动后的运行时间
+  - 在线用户: 当前唯一IP数
+  - 活跃连接: 当前TCP连接数
+  - 累计访客: 历史唯一IP数
+  - 请求总数: 总请求量
+  - 平均QPS: 每秒请求数
+  - 服务器时间: 当前服务器时间
+  
+  与后端交互:
+  - GET /status.json: 获取JSON格式的状态数据
+-->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -39,8 +58,28 @@
 </section>
 </div>
 <script>
+/**
+ * 状态更新函数
+ * 
+ * 工作流程:
+ * 1. 使用fetch API请求/status.json
+ * 2. 解析JSON响应
+ * 3. 更新页面各个指标元素
+ * 
+ * JSON响应格式:
+ * {
+ *   "uptime_seconds": 3600,        // 运行秒数
+ *   "online_users": 10,            // 在线用户数
+ *   "online_connections": 5,       // 活跃连接数
+ *   "total_unique_visitors": 100,  // 累计访客
+ *   "total_requests": 1000,        // 请求总数
+ *   "avg_qps": 0.28,               // 平均QPS
+ *   "server_time": "2026-01-12 10:30:00"  // 服务器时间
+ * }
+ */
 const updateStatus = () => {
     fetch('/status.json').then(r => r.json()).then(data => {
+        // 将秒数转换为 时:h 分:m 秒:s 格式
         const sec = data.uptime_seconds || 0;
         const h = Math.floor(sec / 3600);
         const m = Math.floor((sec % 3600) / 60);

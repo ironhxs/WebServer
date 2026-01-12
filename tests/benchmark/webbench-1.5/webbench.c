@@ -14,6 +14,27 @@
  *    2 - bad param
  *    3 - internal error, fork failed
  * 
+ * ====================================================================
+ * 中文说明:
+ * WebBench 是一个简单的 Web 服务器压力测试工具
+ * 
+ * 工作原理:
+ * 1. 父进程创建多个子进程 (fork)
+ * 2. 每个子进程并发发送HTTP请求
+ * 3. 使用 alarm() 定时，到时停止测试
+ * 4. 子进程通过管道(pipe)将结果返回父进程
+ * 5. 父进程汇总统计并输出结果
+ * 
+ * 核心指标:
+ * - Speed: 每分钟完成的请求数 (pages/min) = QPS * 60
+ * - bytes/sec: 每秒传输的字节数
+ * - susceed: 成功请求数
+ * - failed: 失败请求数
+ * 
+ * 使用示例:
+ *   ./webbench -c 1000 -t 30 http://localhost:9006/
+ *   含义: 1000并发连接，持续30秒
+ * ====================================================================
  */ 
 #include "socket.c"
 #include <unistd.h>
@@ -24,31 +45,37 @@
 #include <time.h>
 #include <signal.h>
 
-/* values */
-volatile int timerexpired=0;
-int speed=0;
-int failed=0;
-int bytes=0;
-/* globals */
-int http10=1; /* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */
-/* Allow: GET, HEAD, OPTIONS, TRACE */
-#define METHOD_GET 0
-#define METHOD_HEAD 1
-#define METHOD_OPTIONS 2
-#define METHOD_TRACE 3
+/* ==================== 全局变量 ====================  */
+
+/* 测试结果统计变量 */
+volatile int timerexpired=0;  /* 定时器是否超时标志 (volatile防止编译器优化) */
+int speed=0;   /* 成功请求数 */
+int failed=0;  /* 失败请求数 */
+int bytes=0;   /* 接收的总字节数 */
+
+/* HTTP协议版本: 0=HTTP/0.9, 1=HTTP/1.0, 2=HTTP/1.1 */
+int http10=1;
+/* HTTP请求方法定义 */
+#define METHOD_GET 0      /* GET方法 - 获取资源 */
+#define METHOD_HEAD 1     /* HEAD方法 - 只获取头部 */
+#define METHOD_OPTIONS 2  /* OPTIONS方法 - 查询支持的方法 */
+#define METHOD_TRACE 3    /* TRACE方法 - 路径追踪 */
 #define PROGRAM_VERSION "1.5"
-int method=METHOD_GET;
-int clients=1;
-int force=0;
-int force_reload=0;
-int proxyport=80;
-char *proxyhost=NULL;
-int benchtime=30;
-/* internal */
-int mypipe[2];
-char host[MAXHOSTNAMELEN];
+
+/* ==================== 配置变量 ====================  */
+int method=METHOD_GET;    /* 默认使用GET方法 */
+int clients=1;            /* 并发客户端数量(子进程数) */
+int force=0;              /* 是否强制模式(不等待服务器响应) */
+int force_reload=0;       /* 是否发送无缓存请求(Pragma: no-cache) */
+int proxyport=80;         /* 代理服务器端口 */
+char *proxyhost=NULL;     /* 代理服务器主机 */
+int benchtime=30;         /* 测试持续时间(秒) */
+
+/* ==================== 内部变量 ====================  */
+int mypipe[2];            /* 父子进程通信管道 [0]=读端, [1]=写端 */
+char host[MAXHOSTNAMELEN];/* 目标服务器主机名 */
 #define REQUEST_SIZE 2048
-char request[REQUEST_SIZE];
+char request[REQUEST_SIZE];/* HTTP请求报文缓冲区 */
 
 static const struct option long_options[]=
 {
@@ -69,13 +96,24 @@ static const struct option long_options[]=
  {NULL,0,NULL,0}
 };
 
-/* prototypes */
+/* 函数声明 */
 static void benchcore(const char* host,const int port, const char *request);
 static int bench(void);
 static void build_request(const char *url);
 
+/**
+ * @brief SIGALRM信号处理函数
+ * @param signal 信号编号 (未使用)
+ * 
+ * 工作机制:
+ * - alarm(benchtime)设置定时器
+ * - benchtime秒后触发SIGALRM信号
+ * - 此函数被调用，设置timerexpired=1
+ * - benchcore()检测到该标志后停止发送请求
+ */
 static void alarm_handler(int signal)
 {
+   (void)signal;  /* 消除未使用参数警告 */
    timerexpired=1;
 }	
 
@@ -290,14 +328,31 @@ void build_request(const char *url)
   // printf("Req=%s\n",request);
 }
 
-/* vraci system rc error kod */
+/**
+ * @brief 执行压力测试的主函数
+ * @return 系统错误码 (0=成功, 1=连接失败, 3=fork失败)
+ * 
+ * 核心流程:
+ * 1. 首先测试连接服务器是否可用
+ * 2. 创建管道(pipe)用于父子进程通信
+ * 3. fork()创建多个子进程
+ * 4. 子进程: 执行benchcore()发送HTTP请求
+ * 5. 父进程: 从pipe读取汇总结果
+ * 6. 输出最终统计信息
+ * 
+ * 关键系统调用:
+ * - pipe(): 创建匿名管道
+ * - fork(): 创建子进程
+ * - fdopen(): 将fd转为FILE*
+ * - fscanf(): 从管道读取数据
+ */
 static int bench(void)
 {
   int i,j,k;	
   pid_t pid=0;
   FILE *f;
 
-  /* check avaibility of target server */
+  /* 步骤1: 检查目标服务器是否可达 */
   i=Socket(proxyhost==NULL?host:proxyhost,proxyport);
   if(i<0) { 
 	   fprintf(stderr,"\nConnect to server failed. Aborting benchmark.\n");
@@ -340,14 +395,19 @@ static int bench(void)
 
   if(pid== (pid_t) 0)
   {
-    /* I am a child */
+    /**
+     * 子进程处理逻辑:
+     * 1. 调用benchcore()循环发送HTTP请求
+     * 2. 直到alarm信号到达 (timerexpired=1)
+     * 3. 将结果写入管道返回给父进程
+     */
     if(proxyhost==NULL)
       benchcore(host,proxyport,request);
          else
       benchcore(proxyhost,proxyport,request);
 
-         /* write results to pipe */
-	 f=fdopen(mypipe[1],"w");
+    /* 将结果写入管道: "成功数 失败数 字节数" */
+    f=fdopen(mypipe[1],"w");  /* 将fd转为FILE*便于fprintf */
 	 if(f==NULL)
 	 {
 		 perror("open pipe for writing failed.");
@@ -359,7 +419,13 @@ static int bench(void)
 	 return 0;
   } else
   {
-	  f=fdopen(mypipe[0],"r");
+	  /**
+	   * 父进程处理逻辑:
+	   * 1. 从管道读取所有子进程的结果
+	   * 2. 累加统计数据
+	   * 3. 输出最终报告
+	   */
+	  f=fdopen(mypipe[0],"r");  /* 打开管道读端 */
 	  if(f==NULL) 
 	  {
 		  perror("open pipe for reading failed.");
@@ -395,37 +461,89 @@ static int bench(void)
   return i;
 }
 
+/**
+ * @brief 核心压测函数 - 循环发送HTTP请求
+ * @param host 目标主机
+ * @param port 目标端口
+ * @param req HTTP请求报文
+ * 
+ * 工作流程:
+ * 1. 设置alarm定时器，到时触发timerexpired标志
+ * 2. 循环执行:
+ *    a. 创建TCP连接
+ *    b. 发送HTTP请求
+ *    c. 读取响应(如果force=0)
+ *    d. 关闭连接，统计结果
+ * 3. 直到timerexpired=1才退出
+ * 
+ * 关键系统调用:
+ * - alarm(): 设置定时信号
+ * - sigaction(): 注册信号处理函数
+ * - write(): 发送HTTP请求
+ * - read(): 接收HTTP响应
+ * - shutdown(): 半关闭连接(HTTP/0.9时用)
+ */
 void benchcore(const char *host,const int port,const char *req)
 {
  int rlen;
- char buf[1500];
+ char buf[1500];  /* 接收缓冲区 */
  int s,i;
  struct sigaction sa;
 
- /* setup alarm signal handler */
+ /**
+  * sigaction() - 设置信号处理函数
+  * 注册SIGALRM的处理函数为alarm_handler
+  */
  sa.sa_handler=alarm_handler;
  sa.sa_flags=0;
  if(sigaction(SIGALRM,&sa,NULL))
     exit(3);
+
+ /**
+  * alarm() - 设置定时器
+  * @param seconds: benchtime秒后触发SIGALRM
+  * 到时alarm_handler被调用，设置timerexpired=1
+  */
  alarm(benchtime);
 
  rlen=strlen(req);
+
+ /**
+  * 主循环: 不断发送HTTP请求直到定时器超时
+  * 
+  * 每次循环:
+  * 1. 检查timerexpired标志
+  * 2. 创建socket连接
+  * 3. 发送请求(write)
+  * 4. 读取响应(read) - 如果force=0
+  * 5. 关闭连接
+  * 6. 更新统计计数
+  */
  nexttry:while(1)
  {
+    /* 检查定时器是否超时 */
     if(timerexpired)
     {
        if(failed>0)
        {
           /* fprintf(stderr,"Correcting failed by signal\n"); */
-          failed--;
+          failed--;  /* 修正: 最后一次失败可能是因为超时导致的 */
        }
        return;
     }
+    
+    /* 创建TCP连接 */
     s=Socket(host,port);                          
-    if(s<0) { failed++;continue;} 
+    if(s<0) { failed++;continue;}  /* 连接失败，计入失败数 */
+    
+    /* 发送HTTP请求 */
     if(rlen!=write(s,req,rlen)) {failed++;close(s);continue;}
+    
+    /* HTTP/0.9时需要半关闭写端，通知服务器请求发送完毕 */
     if(http10==0) 
 	    if(shutdown(s,1)) { failed++;close(s);continue;}
+    
+    /* 读取服务器响应 (force=0时才读) */
     if(force==0) 
     {
             /* read all available data from socket */

@@ -1,4 +1,22 @@
 ﻿<!DOCTYPE html>
+<!--
+  log.html - 用户登录页面
+  
+  功能:
+  - 提供用户名/密码登录表单
+  - 表单提交到CGI处理程序验证身份
+  
+  与后端交互:
+  - POST /2CGISQL.cgi
+  - 参数: user=用户名&password=密码
+  - 成功: 跳转到welcome页面, 设置ws_user Cookie
+  - 失败: 跳转到logError页面
+  
+  相关页面:
+  - register.html: 注册页面
+  - logError.html: 登录失败提示
+  - welcome.html: 登录成功欢迎页
+-->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -9,6 +27,7 @@
 </head>
 <body>
 <div class="page">
+<!-- 导航栏 -->
 <div class="nav">
     <div class="brand">WebServer 实验站</div>
     <div class="nav-links">
@@ -21,9 +40,20 @@
         <a class="btn primary" href="/pages/register.html">注册</a>
     </div>
 </div>
+
+<!-- 登录表单面板 -->
 <section class="panel" style="max-width: 560px; margin: 0 auto;">
     <h2 style="font-size: 24px;">账号登录</h2>
     <p style="color: var(--muted); margin-top: 8px;">请输入用户名和密码。</p>
+    
+    <!--
+      表单说明:
+      - action: 提交到CGI程序处理
+      - method: 使用POST方法发送数据
+      - 2CGISQL.cgi: 处理登录/注册的CGI程序
+        - 路径中的2表示登录操作
+        - 路径中的3表示注册操作
+    -->
     <form class="form" action="/2CGISQL.cgi" method="post">
         <div class="field">
             <label>用户名</label>

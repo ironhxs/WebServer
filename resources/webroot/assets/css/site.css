@@ -1,15 +1,42 @@
+/**
+ * site.css - WebServer 全局样式表
+ * 
+ * 设计风格:
+ * - 深色主题 (Dark Mode)
+ * - 渐变背景 (Gradient Background)
+ * - 玻璃态效果 (Glassmorphism)
+ * - 响应式布局 (Responsive Design)
+ * 
+ * 色彩变量:
+ * - --bg: 页面背景色 (深蓝黑)
+ * - --surface: 卡片/面板背景色
+ * - --accent: 主强调色 (青色)
+ * - --text: 主文本色
+ * - --muted: 次要文本色
+ * 
+ * 组件说明:
+ * - .nav: 顶部导航栏
+ * - .hero: 首页主展示区
+ * - .panel: 内容面板/卡片容器
+ * - .card: 信息卡片
+ * - .btn: 按钮 (primary/ghost/secondary)
+ * - .form/.field: 表单组件
+ * - .gallery: 图片画廊
+ */
+
 :root {
-    --bg: #0b1221;
-    --surface: #10192b;
-    --surface-2: #16233b;
-    --accent: #22d3ee;
-    --accent-strong: #0ea5a4;
-    --accent-warm: #f59e0b;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --border: rgba(148, 163, 184, 0.15);
-    --shadow: 0 24px 60px rgba(3, 7, 18, 0.45);
-    --radius: 26px;
+    /* ========== 颜色变量 ========== */
+    --bg: #0b1221;              /* 页面背景 - 深蓝黑 */
+    --surface: #10192b;         /* 面板背景 - 深蓝 */
+    --surface-2: #16233b;       /* 卡片背景 - 中蓝 */
+    --accent: #22d3ee;          /* 主强调色 - 青色 */
+    --accent-strong: #0ea5a4;   /* 深强调色 - 青绿 */
+    --accent-warm: #f59e0b;     /* 暖强调色 - 橙色 */
+    --text: #e2e8f0;            /* 主文本色 - 浅灰白 */
+    --muted: #94a3b8;           /* 次要文本 - 灰色 */
+    --border: rgba(148, 163, 184, 0.15);  /* 边框色 */
+    --shadow: 0 24px 60px rgba(3, 7, 18, 0.45);  /* 阴影效果 */
+    --radius: 26px;             /* 圆角半径 */
 }
 
 * {

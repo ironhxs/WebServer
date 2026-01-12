@@ -540,17 +540,31 @@ void http_conn::initmysql_result(connection_pool *connPool)
 
 
 
-/** @brief 设置fd为非阻塞
- * @return 原有flag
+/**
+ * @brief 设置文件描述符为非阻塞模式
+ * 
+ * @param fd 文件描述符
+ * @return int 原有的文件状态标志
+ * 
+ * 非阻塞I/O说明：
+ * - 阻塞模式：read/write会等待直到操作完成
+ * - 非阻塞模式：立即返回，无数据时返回-1，errno=EAGAIN
+ * 
+ * 库函数说明：
+ * - fcntl(): <fcntl.h> 文件控制操作
+ *   * F_GETFL: 获取文件状态标志
+ *   * F_SETFL: 设置文件状态标志
+ *   * O_NONBLOCK: 非阻塞标志
+ *   * 成功返回0，失败返回-1
  */
 int setnonblocking(int fd)
 
 {
-
+    // fcntl(fd, F_GETFL): 获取当前文件状态标志
     int old_option = fcntl(fd, F_GETFL);
-
+    // 添加非阻塞标志
     int new_option = old_option | O_NONBLOCK;
-
+    // fcntl(fd, F_SETFL): 设置新的文件状态标志
     fcntl(fd, F_SETFL, new_option);
 
     return old_option;
@@ -559,9 +573,28 @@ int setnonblocking(int fd)
 
 
 
-// Register fd in epoll (optionally one-shot).
-
-/** @brief 将fd注册到epoll */
+/**
+ * @brief 将文件描述符注册到epoll实例
+ * 
+ * @param epollfd epoll实例描述符
+ * @param fd 待注册的文件描述符
+ * @param one_shot 是否启用EPOLLONESHOT（防止多线程同时处理同一连接）
+ * @param TRIGMode 触发模式（0=LT水平触发, 1=ET边缘触发）
+ * 
+ * 事件标志说明：
+ * - EPOLLIN: 可读事件（有数据到达）
+ * - EPOLLET: 边缘触发模式
+ * - EPOLLRDHUP: 对端关闭连接或半关闭
+ * - EPOLLONESHOT: 事件只触发一次，处理完需重新注册
+ * 
+ * 库函数说明：
+ * - epoll_ctl(): <sys/epoll.h> epoll控制操作
+ *   * 参数1: epoll实例描述符
+ *   * 参数2: 操作类型（EPOLL_CTL_ADD/MOD/DEL）
+ *   * 参数3: 目标文件描述符
+ *   * 参数4: epoll_event结构指针
+ *   * 成功返回0，失败返回-1
+ */
 void addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
 
 {
@@ -571,47 +604,69 @@ void addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
     event.data.fd = fd;
 
 
-
+    // 根据触发模式设置事件标志
     if (1 == TRIGMode)
-
+        // ET模式：边缘触发，需要一次性读完所有数据
         event.events = EPOLLIN | EPOLLET | EPOLLRDHUP;
 
     else
-
+        // LT模式：水平触发，有数据就会一直触发
         event.events = EPOLLIN | EPOLLRDHUP;
 
 
-
+    // EPOLLONESHOT: 确保一个socket只被一个线程处理
     if (one_shot)
 
         event.events |= EPOLLONESHOT;
-
+    // epoll_ctl(): 将fd添加到epoll监听集合
     epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &event);
-
+    // 设置为非阻塞，配合epoll使用
     setnonblocking(fd);
 
 }
 
 
 
-// Remove fd from epoll and close it.
-
-/** @brief 从epoll移除fd并关闭 */
+/**
+ * @brief 从epoll移除文件描述符并关闭连接
+ * 
+ * @param epollfd epoll实例描述符
+ * @param fd 待移除的文件描述符
+ * 
+ * 库函数说明：
+ * - epoll_ctl(EPOLL_CTL_DEL): 从epoll中删除fd
+ * - close(): <unistd.h> 关闭文件描述符
+ *   * 释放内核中的文件描述符资源
+ *   * 对于socket，会触发TCP四次挥手
+ */
 void removefd(int epollfd, int fd)
 
 {
-
+    // 从epoll监听集合中删除
     epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, 0);
-
+    // 关闭socket，释放资源
     close(fd);
 
 }
 
 
 
-// Update epoll events for the fd.
-
-/** @brief 修改fd的epoll监听事件 */
+/**
+ * @brief 修改文件描述符在epoll中的监听事件
+ * 
+ * @param epollfd epoll实例描述符
+ * @param fd 目标文件描述符
+ * @param ev 新的事件类型（EPOLLIN读/EPOLLOUT写）
+ * @param TRIGMode 触发模式
+ * 
+ * 使用场景：
+ * - 读取请求完成后，改为监听写事件（准备发送响应）
+ * - 写入响应完成后，改为监听读事件（等待下一个请求）
+ * - EPOLLONESHOT事件处理完后需要重新注册
+ * 
+ * 库函数说明：
+ * - epoll_ctl(EPOLL_CTL_MOD): 修改已注册fd的事件
+ */
 void modfd(int epollfd, int fd, int ev, int TRIGMode)
 
 {
@@ -621,9 +676,9 @@ void modfd(int epollfd, int fd, int ev, int TRIGMode)
     event.data.fd = fd;
 
 
-
+    // 根据触发模式设置事件标志
     if (1 == TRIGMode)
-
+        // ET模式 + ONESHOT + 对端关闭检测
         event.events = ev | EPOLLET | EPOLLONESHOT | EPOLLRDHUP;
 
     else
@@ -631,7 +686,7 @@ void modfd(int epollfd, int fd, int ev, int TRIGMode)
         event.events = ev | EPOLLONESHOT | EPOLLRDHUP;
 
 
-
+    // epoll_ctl(): 修改fd的监听事件
     epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, &event);
 
 }
@@ -882,9 +937,32 @@ http_conn::LINE_STATUS http_conn::parse_line()
 }
 
 
-
-// Read once from the socket (LT/ET behavior depends on mode).
-
+/**
+ * @brief 从socket读取客户端数据（一次性读取）
+ * 
+ * @return true 读取成功（可能部分读取）
+ * @return false 读取失败或连接关闭
+ * 
+ * 读取策略：
+ * - LT模式：循环读取直到EAGAIN
+ * - ET模式：必须一次性读完所有数据
+ * - 支持动态扩展缓冲区以处理大文件上传
+ * 
+ * 库函数说明：
+ * - recv(): <sys/socket.h> 从socket接收数据
+ *   * 参数1: socket描述符
+ *   * 参数2: 接收缓冲区指针
+ *   * 参数3: 缓冲区大小
+ *   * 参数4: 标志位（0=默认阻塞读取）
+ *   * 返回值:
+ *     - >0: 实际读取的字节数
+ *     - =0: 对端关闭连接（收到FIN）
+ *     - <0: 出错，检查errno
+ *   * errno说明:
+ *     - EAGAIN/EWOULDBLOCK: 非阻塞模式下暂无数据
+ *     - EINTR: 被信号中断，应重试
+ *     - ECONNRESET: 连接被对端重置
+ */
 bool http_conn::read_once()
 
 {
@@ -2777,16 +2855,25 @@ http_conn::HTTP_CODE http_conn::do_request()
 
 
 
+    // 构建完整的文件路径
     snprintf(m_real_file, FILENAME_LEN, "%s%s", doc_root, url.c_str());
-
+    
+    // stat(): <sys/stat.h> 获取文件状态信息
+    //   * 参数1: 文件路径
+    //   * 参数2: stat结构体指针（输出参数）
+    //   * 返回: 成功返回0，失败返回-1
+    //   * stat结构体重要字段:
+    //     - st_mode: 文件类型和权限
+    //     - st_size: 文件大小（字节）
+    //     - st_mtime: 最后修改时间
     if (stat(m_real_file, &m_file_stat) < 0)
 
         return render_not_found();
-
+    // S_IROTH: 其他用户可读权限位
     if (!(m_file_stat.st_mode & S_IROTH))
 
         return FORBIDDEN_REQUEST;
-
+    // S_ISDIR(): 判断是否为目录
     if (S_ISDIR(m_file_stat.st_mode))
 
         return BAD_REQUEST;
@@ -2850,13 +2937,26 @@ http_conn::HTTP_CODE http_conn::do_request()
         m_content_type = "application/octet-stream";
 
 
-
+    // 打开文件并通过mmap映射到内存
+    // open(): <fcntl.h> 打开文件
+    //   * O_RDONLY: 只读模式
+    //   * 返回文件描述符，失败返回-1
     int fd = open(m_real_file, O_RDONLY);
-
+    
+    // mmap(): <sys/mman.h> 将文件映射到内存
+    //   * 参数1: 映射起始地址（0表示由系统选择）
+    //   * 参数2: 映射长度（文件大小）
+    //   * 参数3: 保护标志（PROT_READ只读）
+    //   * 参数4: 映射类型（MAP_PRIVATE私有映射，写时复制）
+    //   * 参数5: 文件描述符
+    //   * 参数6: 文件偏移量（从头开始）
+    //   * 返回: 映射区域起始地址，失败返回MAP_FAILED
+    // 
+    // 零拷贝优势: 文件内容直接从内核缓冲区发送，无需拷贝到用户空间
     m_file_address = (char *)mmap(0, m_file_stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 
     m_is_mmap = true;
-
+    // 映射完成后可以关闭fd，映射仍然有效
     close(fd);
 
     return FILE_REQUEST;
@@ -2955,6 +3055,21 @@ bool http_conn::execute_php(const char *php_path)
     m_is_mmap = false;
     return true;
 }
+
+/**
+ * @brief 释放内存映射的文件资源
+ * 
+ * 根据文件类型选择释放方式：
+ * - mmap映射的静态文件：使用munmap释放
+ * - PHP动态内容：使用free释放
+ * 
+ * 库函数说明：
+ * - munmap(): <sys/mman.h> 解除内存映射
+ *   * 参数1: 映射区域的起始地址（mmap返回值）
+ *   * 参数2: 映射区域的大小
+ *   * 成功返回0，失败返回-1
+ *   * 必须与mmap成对使用，避免内存泄漏
+ */
 void http_conn::unmap()
 
 {
@@ -2962,7 +3077,7 @@ void http_conn::unmap()
     if (m_is_mmap && m_file_address)
 
     {
-
+        // munmap(): 解除mmap建立的内存映射
         munmap(m_file_address, m_file_stat.st_size);
 
     }
@@ -2986,7 +3101,29 @@ void http_conn::unmap()
 }
 
 
-
+/**
+ * @brief 向客户端发送HTTP响应
+ * 
+ * @return true 发送成功或需要继续发送
+ * @return false 发送失败，连接应关闭
+ * 
+ * 使用writev实现分散写入（scatter write）：
+ * - 第一块：HTTP响应头（m_write_buf）
+ * - 第二块：响应体/文件内容（m_file_address）
+ * 
+ * 库函数说明：
+ * - writev(): <sys/uio.h> 分散写入（聚集写）
+ *   * 参数1: 文件描述符
+ *   * 参数2: iovec结构数组
+ *   * 参数3: 数组元素个数
+ *   * 返回: 实际写入的字节数，失败返回-1
+ *   * 优点: 避免多次系统调用，减少数据拷贝
+ *   * iovec结构: { void *iov_base; size_t iov_len; }
+ * 
+ * 非阻塞写入处理：
+ * - errno=EAGAIN: 发送缓冲区满，需等待可写事件
+ * - 部分发送: 更新指针和剩余长度，继续发送
+ */
 bool http_conn::write()
 
 {
