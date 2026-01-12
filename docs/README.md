@@ -676,80 +676,6 @@ OPT_LINGER = 1;
 
 
 
-## 常见问题
-
-
-
-### 1. 编译错误：找不到 mysql.h
-
-```bash
-
-# 安装MySQL开发库
-
-sudo apt-get install libmysqlclient-dev
-
-```
-
-
-
-### 2. 运行错误：端口已被占用
-
-```bash
-
-# 检查端口占用
-
-lsof -i :9006
-
-
-
-# 更换端口
-
-./server -p 8080
-
-```
-
-
-
-### 3. 数据库连接失败
-
-```bash
-
-# 检查MySQL是否运行
-
-sudo systemctl status mysql
-
-
-
-# 检查数据库配置（webserver.cpp）
-
-user = "root";
-
-passwd = "你的密码";
-
-databasename = "hxsdb";
-
-```
-
-
-
-### 4. 页面404错误
-
-```bash
-
-# 检查root目录是否存在
-
-ls resources/webroot/
-
-
-
-# 检查文件权限
-
-chmod -R 755 resources/webroot/
-
-```
-
-
-
 ## 开发计划
 
 
@@ -828,16 +754,14 @@ chmod -R 755 resources/webroot/
 
 ## 功能入口
 
-- 首页：http://localhost:9006/
-- 登录：http://localhost:9006/pages/log.html
-- 注册：http://localhost:9006/pages/register.html
-- 图集：http://localhost:9006/pages/picture.html
-- 视频：http://localhost:9006/pages/video.html
-- 上传：http://localhost:9006/pages/upload.html（建议小于 2MB）
-- 我的上传：http://localhost:9006/uploads/list
-- 监控：http://localhost:9006/pages/status.html
-- PHP 示例：http://localhost:9006/phpinfo.php
-- 状态 JSON：http://localhost:9006/status.json（含平均 QPS）
+- **首页**：http://localhost:9006/
+- **演示路线**：http://localhost:9006/demo.html
+- **登录**：http://localhost:9006/pages/log.html
+- **注册**：http://localhost:9006/pages/register.html
+- **上传文件**：http://localhost:9006/pages/upload.html
+- **我的上传**：http://localhost:9006/uploads/list（图集和视频已合并）
+- **监控页面**：http://localhost:9006/pages/status.html
+- **PHP 示例**：http://localhost:9006/phpinfo.php
 
 ## 内网穿透（Cloudflare 推荐）
 
@@ -879,4 +803,3 @@ curl http://localhost:9006/phpinfo.php
 ./scripts/run_webbench.sh http://localhost:9006/ 10000 10
 ```
 
-- 图集与视频为公共示例资源，需登录后访问。

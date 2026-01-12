@@ -110,18 +110,14 @@ tail -f server.log
 
 启动后在浏览器访问：
 
-- **主页**：http://localhost:9006/
-
-- **PHP 测试**：http://localhost:9006/phpinfo.php
-
-- **登录页面**：http://localhost:9006/pages/log.html
-
-- **注册页面**：http://localhost:9006/pages/register.html
-  - **图集页面**：http://localhost:9006/pages/picture.html
-  - **视频页面**：http://localhost:9006/pages/video.html
-  - **上传页面**：http://localhost:9006/pages/upload.html
-  - **监控页面**：http://localhost:9006/pages/status.html
-  - **PHP 示例**：http://localhost:9006/phpinfo.php
+- **首页**：http://localhost:9006/
+- **演示路线**：http://localhost:9006/demo.html
+- **登录**：http://localhost:9006/pages/log.html
+- **注册**：http://localhost:9006/pages/register.html
+- **上传文件**：http://localhost:9006/pages/upload.html
+- **我的上传**：http://localhost:9006/uploads/list（图集和视频已合并）
+- **监控页面**：http://localhost:9006/pages/status.html
+- **PHP 示例**：http://localhost:9006/phpinfo.php
 
 
 

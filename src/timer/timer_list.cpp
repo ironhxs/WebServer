@@ -1,14 +1,23 @@
+/**
+ * @file timer_list.cpp
+ * @brief 定时器链表与工具类实现
+ */
+
 #include "timer_list.h"
 #include "http_connection.h"
 
-// 定时器链表的构造函数，初始化头尾指针
+/**
+ * @brief 定时器链表构造函数
+ */
 sort_timer_lst::sort_timer_lst()
 {
     head = NULL;
     tail = NULL;
 }
 
-// 定时器链表的析构函数，释放所有定时器
+/**
+ * @brief 定时器链表析构函数
+ */
 sort_timer_lst::~sort_timer_lst()
 {
     util_timer *tmp = head;
@@ -20,7 +29,10 @@ sort_timer_lst::~sort_timer_lst()
     }
 }
 
-// 添加定时器到链表中
+/**
+ * @brief 将定时器插入链表
+ * @param timer 定时器指针
+ */
 void sort_timer_lst::add_timer(util_timer *timer)
 {
     if (!timer)
@@ -45,7 +57,10 @@ void sort_timer_lst::add_timer(util_timer *timer)
     add_timer(timer, head);
 }
 
-// 调整定时器的位置
+/**
+ * @brief 调整定时器位置
+ * @param timer 定时器指针
+ */
 void sort_timer_lst::adjust_timer(util_timer *timer)
 {
     if (!timer)
@@ -76,7 +91,10 @@ void sort_timer_lst::adjust_timer(util_timer *timer)
     }
 }
 
-// 删除定时器
+/**
+ * @brief 删除定时器
+ * @param timer 定时器指针
+ */
 void sort_timer_lst::del_timer(util_timer *timer)
 {
     if (!timer)
@@ -113,7 +131,9 @@ void sort_timer_lst::del_timer(util_timer *timer)
     delete timer;
 }
 
-// 定时器到期处理函数
+/**
+ * @brief 处理到期定时器
+ */
 void sort_timer_lst::tick()
 {
     if (!head)
@@ -142,7 +162,11 @@ void sort_timer_lst::tick()
     }
 }
 
-// 添加定时器到链表中的辅助函数
+/**
+ * @brief 辅助插入函数（从指定节点开始）
+ * @param timer 定时器指针
+ * @param lst_head 起始节点
+ */
 void sort_timer_lst::add_timer(util_timer *timer, util_timer *lst_head)
 {
     util_timer *prev = lst_head;
@@ -170,13 +194,20 @@ void sort_timer_lst::add_timer(util_timer *timer, util_timer *lst_head)
     }
 }
 
-// 工具类初始化函数
+/**
+ * @brief 工具类初始化
+ * @param timeslot 定时器槽间隔
+ */
 void Utils::init(int timeslot)
 {
     m_TIMESLOT = timeslot;
 }
 
-// 设置文件描述符为非阻塞模式
+/**
+ * @brief 设置fd为非阻塞
+ * @param fd 文件描述符
+ * @return 原有flag
+ */
 int Utils::setnonblocking(int fd)
 {
     int old_option = fcntl(fd, F_GETFL);
@@ -185,7 +216,13 @@ int Utils::setnonblocking(int fd)
     return old_option;
 }
 
-// 注册读事件到内核事件表，支持 ET 模式和 EPOLLONESHOT
+/**
+ * @brief 注册fd到epoll
+ * @param epollfd epoll实例fd
+ * @param fd 目标fd
+ * @param one_shot 是否使用EPOLLONESHOT
+ * @param TRIGMode 触发模式
+ */
 void Utils::addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
 {
     epoll_event event;
@@ -202,7 +239,10 @@ void Utils::addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
     setnonblocking(fd);
 }
 
-// 信号处理函数，将信号发送到管道
+/**
+ * @brief 信号处理函数（写入管道通知）
+ * @param sig 信号编号
+ */
 void Utils::sig_handler(int sig)
 {
     int save_errno = errno; // 保存原来的 errno
@@ -211,7 +251,12 @@ void Utils::sig_handler(int sig)
     errno = save_errno; // 恢复 errno
 }
 
-// 设置信号处理函数
+/**
+ * @brief 设置信号处理函数
+ * @param sig 信号编号
+ * @param handler 处理函数
+ * @param restart 是否自动重启系统调用
+ */
 void Utils::addsig(int sig, void(handler)(int), bool restart)
 {
     struct sigaction sa;
@@ -223,25 +268,36 @@ void Utils::addsig(int sig, void(handler)(int), bool restart)
     assert(sigaction(sig, &sa, NULL) != -1);
 }
 
-// 定时处理任务，并重新设置定时器以持续触发 SIGALRM 信号
+/**
+ * @brief 定时任务处理并重置alarm
+ */
 void Utils::timer_handler()
 {
     m_timer_lst.tick(); // 处理链表中到期的定时器
     alarm(m_TIMESLOT); // 重新设置定时信号
 }
 
-// 显示错误信息并关闭连接
+/**
+ * @brief 发送错误信息并关闭连接
+ * @param connfd 连接fd
+ * @param info 错误提示
+ */
 void Utils::show_error(int connfd, const char *info)
 {
     send(connfd, info, strlen(info), 0);
     close(connfd);
 }
 
-// 静态成员变量初始化
+/**
+ * @brief 静态成员初始化
+ */
 int *Utils::u_pipefd = 0;
 int Utils::u_epollfd = 0;
 
-// 定时器回调函数，关闭客户端连接并减少用户计数
+/**
+ * @brief 定时器回调函数
+ * @param user_data 连接关联数据
+ */
 void cb_func(client_data *user_data)
 {
     epoll_ctl(Utils::u_epollfd, EPOLL_CTL_DEL, user_data->sockfd, 0);

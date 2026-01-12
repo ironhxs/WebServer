@@ -1,3 +1,8 @@
+/**
+ * @file log.cpp
+ * @brief 日志系统实现
+ */
+
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -6,14 +11,18 @@
 #include <pthread.h>
 using namespace std;
 
-// 日志类构造函数，初始化成员变量
+/**
+ * @brief 日志类构造函数
+ */
 Log::Log()
 {
     m_count = 0;       // 日志条数计数
     m_is_async = false; // 默认同步模式
 }
 
-// 日志类析构函数，关闭文件指针
+/**
+ * @brief 日志类析构函数
+ */
 Log::~Log()
 {
     if (m_fp != NULL)
@@ -22,7 +31,15 @@ Log::~Log()
     }
 }
 
-// 初始化日志系统，设置日志文件路径、日志缓冲区大小、日志分割行数等
+/**
+ * @brief 初始化日志系统
+ * @param file_name 日志文件名/路径
+ * @param close_log 是否关闭日志
+ * @param log_buf_size 缓冲区大小
+ * @param split_lines 单文件最大行数
+ * @param max_queue_size 异步队列大小
+ * @return 初始化是否成功
+ */
 bool Log::init(const char *file_name, int close_log, int log_buf_size, int split_lines, int max_queue_size)
 {
     // 如果设置了 max_queue_size，则启用异步日志模式
@@ -73,7 +90,11 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int split
     return true;
 }
 
-// 写日志函数，支持同步和异步两种方式
+/**
+ * @brief 写入一条日志
+ * @param level 日志级别
+ * @param format 格式化字符串
+ */
 void Log::write_log(int level, const char *format, ...)
 {
     struct timeval now = {0, 0};
@@ -165,7 +186,9 @@ void Log::write_log(int level, const char *format, ...)
     va_end(valst);
 }
 
-// 刷新日志到文件
+/**
+ * @brief 刷新日志到文件
+ */
 void Log::flush(void)
 {
     m_mutex.lock();

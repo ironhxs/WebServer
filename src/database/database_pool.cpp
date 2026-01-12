@@ -1,3 +1,8 @@
+/**
+ * @file database_pool.cpp
+ * @brief 数据库连接池实现
+ */
+
 #include <mysql/mysql.h>
 #include <stdio.h>
 #include <string>
@@ -10,6 +15,9 @@
 
 using namespace std;
 
+/**
+ * @brief 连接池构造函数
+ */
 connection_pool::connection_pool()
 {
 	// 初始化连接池，当前连接数和空闲连接数初始化为0
@@ -17,7 +25,9 @@ connection_pool::connection_pool()
 	m_FreeConn = 0;
 }
 
-// 获取连接池的单例对象
+/**
+ * @brief 获取连接池单例
+ */
 connection_pool *connection_pool::GetInstance()
 {
 	// 使用静态局部变量实现单例模式，保证全局只有一个连接池实例
@@ -25,7 +35,16 @@ connection_pool *connection_pool::GetInstance()
 	return &connPool;
 }
 
-// 初始化数据库连接池
+/**
+ * @brief 初始化数据库连接池
+ * @param url 主机地址
+ * @param User 用户名
+ * @param PassWord 密码
+ * @param DBName 数据库名
+ * @param Port 端口号
+ * @param MaxConn 最大连接数
+ * @param close_log 日志开关
+ */
 void connection_pool::init(string url, string User, string PassWord, string DBName, int Port, int MaxConn, int close_log)
 {
 	// 初始化连接池的基本配置信息
@@ -71,7 +90,10 @@ void connection_pool::init(string url, string User, string PassWord, string DBNa
 	m_MaxConn = m_FreeConn;
 }
 
-// 从连接池中获取一个空闲的数据库连接
+/**
+ * @brief 获取一个空闲连接
+ * @return MYSQL连接指针
+ */
 MYSQL *connection_pool::GetConnection()
 {
 	MYSQL *con = NULL;
@@ -96,7 +118,11 @@ MYSQL *connection_pool::GetConnection()
 	return con; // 返回获取的连接
 }
 
-// 释放当前使用的数据库连接，归还到连接池中
+/**
+ * @brief 释放连接并归还连接池
+ * @param con 连接指针
+ * @return 是否释放成功
+ */
 bool connection_pool::ReleaseConnection(MYSQL *con)
 {
 	// 如果连接为空，直接返回 false
@@ -117,7 +143,9 @@ bool connection_pool::ReleaseConnection(MYSQL *con)
 	return true;
 }
 
-// 销毁数据库连接池，关闭所有数据库连接
+/**
+ * @brief 销毁连接池
+ */
 void connection_pool::DestroyPool()
 {
 	lock.lock(); // 加锁保护共享资源
@@ -139,19 +167,28 @@ void connection_pool::DestroyPool()
 	lock.unlock(); // 解锁
 }
 
-// 获取当前空闲的数据库连接数
+/**
+ * @brief 获取空闲连接数
+ * @return 空闲连接数
+ */
 int connection_pool::GetFreeConn()
 {
 	return this->m_FreeConn;
 }
 
-// 连接池的析构函数，销毁所有连接
+/**
+ * @brief 连接池析构函数
+ */
 connection_pool::~connection_pool()
 {
 	DestroyPool(); // 调用销毁连接池的函数
 }
 
-// 连接资源管理类的构造函数
+/**
+ * @brief RAII连接管理构造函数
+ * @param SQL 输出连接指针
+ * @param connPool 连接池对象
+ */
 connectionRAII::connectionRAII(MYSQL **SQL, connection_pool *connPool)
 {
 	// 从连接池中获取一个连接
@@ -160,7 +197,9 @@ connectionRAII::connectionRAII(MYSQL **SQL, connection_pool *connPool)
 	poolRAII = connPool; // 保存连接池的指针
 }
 
-// 连接资源管理类的析构函数
+/**
+ * @brief RAII连接管理析构函数
+ */
 connectionRAII::~connectionRAII()
 {
 	// 释放连接，归还到连接池中

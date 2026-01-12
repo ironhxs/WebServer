@@ -6,6 +6,15 @@
     <link rel="icon" href="/assets/media/favicon.ico">
     <link rel="stylesheet" href="/assets/css/site.css">
     <title>WebServer | 上传</title>
+    <style>
+        .progress-container { display: none; margin-top: 16px; }
+        .progress-bar { width: 100%; height: 24px; background: var(--surface); border-radius: 12px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); width: 0%; transition: width 0.2s; }
+        .progress-text { text-align: center; margin-top: 8px; color: var(--muted); font-size: 14px; }
+        .upload-status { margin-top: 12px; padding: 12px; border-radius: 8px; display: none; }
+        .upload-status.success { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .upload-status.error { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    </style>
 </head>
 <body>
 <div class="page">
@@ -23,20 +32,119 @@
 </div>
 <section class="panel" style="max-width: 720px; margin: 0 auto;">
     <h2 style="font-size: 26px;">文件上传</h2>
-    <p style="color: var(--muted); margin-top: 10px;">支持上传图片或文档，用于展示 HTTP 文件传输能力（建议小于 2MB）。</p>
-    <form class="form" action="/upload" method="post" enctype="multipart/form-data">
+    <p style="color: var(--muted); margin-top: 10px;">支持上传图片、视频或文档（最大 200MB）。</p>
+    <form class="form" id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
         <div class="field">
             <label>选择文件</label>
-            <input type="file" name="file" required>
+            <input type="file" name="file" id="fileInput" required>
+            <small id="fileInfo" style="color: var(--muted); margin-top: 4px;"></small>
         </div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="progress-text" id="progressText">准备上传...</div>
+        </div>
+        <div class="upload-status" id="uploadStatus"></div>
         <div class="actions">
-            <button class="btn primary" type="submit">上传文件</button>
+            <button class="btn primary" type="submit" id="submitBtn">上传文件</button>
             <a class="btn ghost" href="/uploads/list">我的上传</a>
         </div>
     </form>
-    <div class="footer">上传文件将保存到 /uploads/ 目录。</div>
+    <div class="footer">上传文件将保存到 /uploads/ 目录，仅登录用户可见。</div>
 </section>
 </div>
 <script src="/assets/js/nav-auth.js"></script>
+<script>
+(function() {
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            fileInfo.textContent = '文件大小: ' + formatSize(file.size);
+            uploadStatus.style.display = 'none';
+        }
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const xhr = new XMLHttpRequest();
+        
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressFill.style.width = percent + '%';
+                progressText.textContent = '上传中: ' + percent + '% (' + formatSize(e.loaded) + ' / ' + formatSize(e.total) + ')';
+            }
+        });
+
+        xhr.addEventListener('load', function() {
+            progressContainer.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.textContent = '上传文件';
+            
+            if (xhr.status >= 200 && xhr.status < 300) {
+                // 服务器返回 HTML 页面，直接替换当前页面
+                document.open();
+                document.write(xhr.responseText);
+                document.close();
+            } else {
+                uploadStatus.className = 'upload-status error';
+                uploadStatus.textContent = '上传失败: ' + (xhr.statusText || '服务器错误');
+                uploadStatus.style.display = 'block';
+            }
+        });
+
+        xhr.addEventListener('error', function() {
+            progressContainer.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.textContent = '上传文件';
+            uploadStatus.className = 'upload-status error';
+            uploadStatus.textContent = '网络错误，请检查连接后重试';
+            uploadStatus.style.display = 'block';
+        });
+
+        xhr.addEventListener('timeout', function() {
+            progressContainer.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.textContent = '上传文件';
+            uploadStatus.className = 'upload-status error';
+            uploadStatus.textContent = '上传超时，请尝试更小的文件';
+            uploadStatus.style.display = 'block';
+        });
+
+        xhr.open('POST', '/upload', true);
+        xhr.timeout = 300000; // 5分钟超时
+        
+        progressContainer.style.display = 'block';
+        progressFill.style.width = '0%';
+        progressText.textContent = '准备上传...';
+        uploadStatus.style.display = 'none';
+        submitBtn.disabled = true;
+        submitBtn.textContent = '上传中...';
+        
+        xhr.send(formData);
+    });
+})();
+</script>
 </body>
 </html>

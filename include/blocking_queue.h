@@ -1,7 +1,8 @@
-/*************************************************************
-*循环数组实现的阻塞队列，m_back = (m_back + 1) % m_max_size;  
-*线程安全，每个操作前都要先加互斥锁，操作完后，再解锁
-**************************************************************/
+/**
+ * @file blocking_queue.h
+ * @brief 循环数组实现的阻塞队列
+ * @details 线程安全的有界队列，使用互斥锁与条件变量实现生产者/消费者模型。
+ */
 
 #ifndef BLOCK_QUEUE_H
 #define BLOCK_QUEUE_H
@@ -13,10 +14,19 @@
 #include "thread_sync.h"
 using namespace std;
 
+/**
+ * @class block_queue
+ * @brief 阻塞队列模板类（循环数组实现）
+ * @tparam T 队列元素类型
+ */
 template <class T>
 class block_queue
 {
 public:
+    /**
+     * @brief 构造函数
+     * @param max_size 队列最大容量
+     */
     block_queue(int max_size = 1000)
     {
         if (max_size <= 0)
@@ -31,6 +41,9 @@ public:
         m_back = -1;
     }
 
+    /**
+     * @brief 清空队列
+     */
     void clear()
     {
         m_mutex.lock();
@@ -40,6 +53,9 @@ public:
         m_mutex.unlock();
     }
 
+    /**
+     * @brief 析构函数 - 释放队列内存
+     */
     ~block_queue()
     {
         m_mutex.lock();
@@ -48,7 +64,10 @@ public:
 
         m_mutex.unlock();
     }
-    //判断队列是否满了
+    /**
+     * @brief 判断队列是否已满
+     * @return 已满返回true
+     */
     bool full() 
     {
         m_mutex.lock();
@@ -61,7 +80,10 @@ public:
         m_mutex.unlock();
         return false;
     }
-    //判断队列是否为空
+    /**
+     * @brief 判断队列是否为空
+     * @return 为空返回true
+     */
     bool empty() 
     {
         m_mutex.lock();
@@ -73,7 +95,11 @@ public:
         m_mutex.unlock();
         return false;
     }
-    //返回队首元素
+    /**
+     * @brief 获取队首元素（不出队）
+     * @param value 输出队首元素
+     * @return 获取成功返回true
+     */
     bool front(T &value) 
     {
         m_mutex.lock();
@@ -86,7 +112,11 @@ public:
         m_mutex.unlock();
         return true;
     }
-    //返回队尾元素
+    /**
+     * @brief 获取队尾元素（不出队）
+     * @param value 输出队尾元素
+     * @return 获取成功返回true
+     */
     bool back(T &value) 
     {
         m_mutex.lock();
@@ -100,6 +130,10 @@ public:
         return true;
     }
 
+    /**
+     * @brief 获取当前元素数量
+     * @return 队列长度
+     */
     int size() 
     {
         int tmp = 0;
@@ -111,6 +145,10 @@ public:
         return tmp;
     }
 
+    /**
+     * @brief 获取队列最大容量
+     * @return 最大容量
+     */
     int max_size()
     {
         int tmp = 0;
@@ -121,9 +159,11 @@ public:
         m_mutex.unlock();
         return tmp;
     }
-    //往队列添加元素，需要将所有使用队列的线程先唤醒
-    //当有元素push进队列,相当于生产者生产了一个元素
-    //若当前没有线程等待条件变量,则唤醒无意义
+    /**
+     * @brief 入队一个元素
+     * @param item 入队元素
+     * @return 成功返回true，满队列返回false
+     */
     bool push(const T &item)
     {
 
@@ -145,7 +185,11 @@ public:
         m_mutex.unlock();
         return true;
     }
-    //pop时,如果当前队列没有元素,将会等待条件变量
+    /**
+     * @brief 出队一个元素（阻塞等待）
+     * @param item 输出元素
+     * @return 成功返回true
+     */
     bool pop(T &item)
     {
 
@@ -167,7 +211,12 @@ public:
         return true;
     }
 
-    //增加了超时处理
+    /**
+     * @brief 出队一个元素（带超时）
+     * @param item 输出元素
+     * @param ms_timeout 超时时间（毫秒）
+     * @return 成功返回true，超时返回false
+     */
     bool pop(T &item, int ms_timeout)
     {
         struct timespec t = {0, 0};
@@ -199,14 +248,14 @@ public:
     }
 
 private:
-    locker m_mutex;
-    cond m_cond;
+    locker m_mutex; ///< 互斥锁
+    cond m_cond;    ///< 条件变量
 
-    T *m_array;
-    int m_size;
-    int m_max_size;
-    int m_front;
-    int m_back;
+    T *m_array;     ///< 循环数组缓冲区
+    int m_size;     ///< 当前元素数量
+    int m_max_size; ///< 最大容量
+    int m_front;    ///< 队首位置
+    int m_back;     ///< 队尾位置
 };
 
 #endif

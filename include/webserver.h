@@ -25,7 +25,7 @@
 // ========== 全局常量定义 ==========
 const int MAX_FD = 10000;           ///< 系统最大文件描述符数量
 const int MAX_EVENT_NUMBER = 10000; ///< epoll可监听的最大事件数
-const int TIMESLOT = 5;             ///< 定时器最小超时单位（秒）
+const int TIMESLOT = 60;            ///< 定时器最小超时单位（秒），大文件上传总超时 3*60=180秒
 
 /**
  * @class WebServer
@@ -80,12 +80,30 @@ public:
               int log_write , int opt_linger, int trigmode, int sql_num,
               int thread_num, int close_log, int actor_model);
 
-    void thread_pool();                                              ///< 创建线程池
-    void sql_pool();                                                 ///< 创建数据库连接池
-    void log_write();                                                ///< 初始化日志系统
-    void trig_mode();                                                ///< 设置触发模式
-    void eventListen();                                              ///< 开始监听端口
-    void eventLoop();                                                ///< 事件循环主函数
+    /**
+     * @brief 创建线程池
+     */
+    void thread_pool();
+    /**
+     * @brief 创建数据库连接池
+     */
+    void sql_pool();
+    /**
+     * @brief 初始化日志系统
+     */
+    void log_write();
+    /**
+     * @brief 设置触发模式
+     */
+    void trig_mode();
+    /**
+     * @brief 开始监听端口
+     */
+    void eventListen();
+    /**
+     * @brief 事件循环主函数
+     */
+    void eventLoop();
     
     /**
      * @brief 为新连接创建定时器
@@ -107,10 +125,28 @@ public:
      */
     void deal_timer(util_timer *timer, int sockfd);
     
-    bool dealclientdata();                                           ///< 处理新客户端连接
-    bool dealwithsignal(bool& timeout, bool& stop_server);          ///< 处理信号
-    void dealwithread(int sockfd);                                   ///< 处理读事件
-    void dealwithwrite(int sockfd);                                  ///< 处理写事件
+    /**
+     * @brief 处理新客户端连接
+     * @return 是否处理成功
+     */
+    bool dealclientdata();
+    /**
+     * @brief 处理信号事件
+     * @param timeout 是否超时
+     * @param stop_server 是否停止服务
+     * @return 是否处理成功
+     */
+    bool dealwithsignal(bool& timeout, bool& stop_server);
+    /**
+     * @brief 处理读事件
+     * @param sockfd 连接fd
+     */
+    void dealwithread(int sockfd);
+    /**
+     * @brief 处理写事件
+     * @param sockfd 连接fd
+     */
+    void dealwithwrite(int sockfd);
 
 public:
     // ========== 基础配置 ==========
@@ -145,7 +181,12 @@ public:
     int m_CONNTrigmode;          ///< 连接socket触发模式
 
     // ========== 定时器相关 ==========
-    client_data *users_timer;    ///< 客户端定时器数组
+    /**
+     * @brief 客户端定时器数组（索引与fd一一对应）
+     * @details 用于保存每个连接的地址、sockfd及定时器指针，
+     *          便于超时回调快速定位并关闭连接。
+     */
+    client_data *users_timer;
     Utils utils;                 ///< 工具类对象
 };
 #endif

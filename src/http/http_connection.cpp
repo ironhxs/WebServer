@@ -1,4 +1,10 @@
-﻿#include "http_connection.h"
+﻿/**
+ * @file http_connection.cpp
+ * @brief HTTP连接处理实现
+ * @details 实现请求解析、资源处理、响应构建以及辅助工具函数。
+ */
+
+#include "http_connection.h"
 
 
 
@@ -18,10 +24,11 @@
 
 
 
+/// 请求体最大允许大小（字节）
 static const long kMaxBodySize = 200 * 1024 * 1024;
 
 
-// HTTP status strings.
+/// HTTP状态码对应的提示文本
 
 const char *ok_200_title = "OK";
 
@@ -43,8 +50,10 @@ const char *error_500_form = "There was an unusual problem serving the request f
 
 
 
+/// 用户信息互斥锁
 locker m_lock;
 
+/// 内存中的用户表（用户名->密码）
 map<string, string> users;
 
 
@@ -53,22 +62,27 @@ namespace
 
 {
 
+/**
+ * @struct UploadItem
+ * @brief 上传文件元数据
+ */
 struct UploadItem
 
 {
 
-    std::string stored_name;
+    std::string stored_name; ///< 存储后的文件名
 
-    std::string original_name;
+    std::string original_name; ///< 原始文件名
 
-    long long size = 0;
+    long long size = 0; ///< 文件大小（字节）
 
-    long long timestamp = 0;
+    long long timestamp = 0; ///< 上传时间戳
 
 };
 
 
 
+/** @brief 去除字符串首尾空白 */
 std::string trim(const std::string &value)
 
 {
@@ -91,12 +105,14 @@ std::string trim(const std::string &value)
 
 
 
+/** @brief 转换为小写副本 */
 std::string to_lower_copy(std::string value)
 {
     std::transform(value.begin(), value.end(), value.begin(), [](unsigned char ch) { return std::tolower(ch); });
     return value;
 }
 
+/** @brief 将16进制字符转为数值 */
 int hex_value(char ch)
 {
     if (ch >= '0' && ch <= '9')
@@ -108,6 +124,7 @@ int hex_value(char ch)
     return -1;
 }
 
+/** @brief URL解码（%xx与+号） */
 std::string url_decode(const std::string &value)
 {
     std::string out;
@@ -135,6 +152,7 @@ std::string url_decode(const std::string &value)
     return out;
 }
 
+/** @brief 从表单体中提取指定键的值 */
 std::string get_form_value(const std::string &body, const std::string &key)
 {
     std::string pattern = key + "=";
@@ -147,6 +165,7 @@ std::string get_form_value(const std::string &body, const std::string &key)
     return url_decode(raw);
 }
 
+/** @brief 从X-Forwarded-For提取客户端IP */
 std::string extract_forwarded_ip(const std::string &value)
 {
     std::string trimmed = trim(value);
@@ -157,6 +176,7 @@ std::string extract_forwarded_ip(const std::string &value)
     return trim(ip);
 }
 
+/** @brief HTML转义 */
 std::string html_escape(const std::string &value)
 {
     std::string out;
@@ -210,6 +230,7 @@ std::string html_escape(const std::string &value)
 
 
 
+/** @brief 规范化文件名，移除危险字符 */
 std::string sanitize_filename(const std::string &value)
 
 {
@@ -250,6 +271,7 @@ std::string sanitize_filename(const std::string &value)
 
 
 
+/** @brief 格式化时间戳 */
 std::string format_time(time_t timestamp)
 
 {
@@ -282,6 +304,7 @@ std::string format_time(time_t timestamp)
 
 
 
+/** @brief 根据状态码获取简短标题 */
 const char *status_title(int status)
 
 {
@@ -326,6 +349,7 @@ const char *status_title(int status)
 
 
 
+/** @brief 判断是否为图片扩展名 */
 bool is_image_ext(const std::string &ext)
 
 {
@@ -341,6 +365,7 @@ bool is_video_ext(const std::string &ext)
     return ext == ".mp4" || ext == ".webm" || ext == ".ogg";
 }
 
+/** @brief 从sockaddr_in提取IP字符串 */
 std::string ip_from_addr(const sockaddr_in &addr)
 {
     char buf[INET_ADDRSTRLEN] = {0};
@@ -350,6 +375,7 @@ std::string ip_from_addr(const sockaddr_in &addr)
     return std::string(buf);
 }
 
+/** @brief 判断是否为私有IPv4地址 */
 bool is_private_ipv4(const std::string &ip)
 {
     if (ip.rfind("10.", 0) == 0)
@@ -371,6 +397,7 @@ bool is_private_ipv4(const std::string &ip)
     return false;
 }
 
+/** @brief 规范化客户端IP（私有地址统一为local） */
 std::string normalize_client_ip(const std::string &ip)
 {
     if (ip.empty())
@@ -384,6 +411,7 @@ std::string normalize_client_ip(const std::string &ip)
     return ip;
 }
 
+/** @brief 从元数据文件加载用户上传列表 */
 bool load_user_uploads(const std::string &doc_root, const std::string &username, std::vector<UploadItem> &items)
 {
     const std::string meta_path = doc_root + "/uploads/.meta/" + username + ".list";
@@ -460,7 +488,9 @@ bool load_user_uploads(const std::string &doc_root, const std::string &username,
 
 
 
-// Load user credentials from MySQL into the in-memory map.
+/**
+ * @brief 从数据库加载用户信息到内存
+ */
 
 void http_conn::initmysql_result(connection_pool *connPool)
 
@@ -510,6 +540,9 @@ void http_conn::initmysql_result(connection_pool *connPool)
 
 
 
+/** @brief 设置fd为非阻塞
+ * @return 原有flag
+ */
 int setnonblocking(int fd)
 
 {
@@ -528,6 +561,7 @@ int setnonblocking(int fd)
 
 // Register fd in epoll (optionally one-shot).
 
+/** @brief 将fd注册到epoll */
 void addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
 
 {
@@ -562,6 +596,7 @@ void addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
 
 // Remove fd from epoll and close it.
 
+/** @brief 从epoll移除fd并关闭 */
 void removefd(int epollfd, int fd)
 
 {
@@ -576,6 +611,7 @@ void removefd(int epollfd, int fd)
 
 // Update epoll events for the fd.
 
+/** @brief 修改fd的epoll监听事件 */
 void modfd(int epollfd, int fd, int ev, int TRIGMode)
 
 {
@@ -750,6 +786,8 @@ void http_conn::init()
 
     m_cookie.clear();
 
+    m_boundary.clear();
+
     m_dynamic_content.clear();
 
     m_dynamic_content_type.clear();
@@ -873,30 +911,32 @@ bool http_conn::read_once()
     int bytes_read = 0;
 
 
-    // LT mode read.
-
+    // LT mode read - 改为循环读取以支持大文件上传
     if (0 == m_TRIGMode)
-
     {
-
-        if (m_read_idx >= static_cast<long>(m_read_buf.size()))
+        // LT模式也需要循环读取，直到EAGAIN或读完
+        while (true)
         {
-            if (!grow_read_buffer())
-                return false;
+            if (m_read_idx >= static_cast<long>(m_read_buf.size()))
+            {
+                if (!grow_read_buffer())
+                    return false;
+            }
+            bytes_read = recv(m_sockfd, m_read_buf.data() + m_read_idx,
+                              static_cast<int>(m_read_buf.size() - m_read_idx), 0);
+            if (bytes_read < 0)
+            {
+                if (errno == EAGAIN || errno == EWOULDBLOCK)
+                    break;  // 数据暂时读完，返回成功
+                if (errno == EINTR)
+                    continue;  // 被信号中断，继续读
+                return false;  // 真正的错误
+            }
+            if (bytes_read == 0)
+                return false;  // 连接关闭
+            m_read_idx += bytes_read;
         }
-        bytes_read = recv(m_sockfd, m_read_buf.data() + m_read_idx,
-                          static_cast<int>(m_read_buf.size() - m_read_idx), 0);
-        if (bytes_read < 0)
-        {
-            if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
-                return true;
-            return false;
-        }
-        if (bytes_read == 0)
-            return false;
-        m_read_idx += bytes_read;
         return true;
-
     }
 
     // ET mode read.
@@ -1130,6 +1170,23 @@ http_conn::HTTP_CODE http_conn::parse_headers(char *text)
         {
             const char continue_msg[] = "HTTP/1.1 100 Continue\r\n\r\n";
             send(m_sockfd, continue_msg, sizeof(continue_msg) - 1, 0);
+        }
+    }
+    else if (strncasecmp(text, "Content-Type:", 13) == 0)
+    {
+        text += 13;
+        text += strspn(text, " 	");
+        std::string value = text;
+        std::string lower = to_lower_copy(value);
+        size_t pos = lower.find("boundary=");
+        if (pos != std::string::npos)
+        {
+            size_t start = pos + 9;
+            size_t end = value.find(';', start);
+            std::string boundary = trim(value.substr(start, end == std::string::npos ? std::string::npos : end - start));
+            if (boundary.size() >= 2 && boundary.front() == '"' && boundary.back() == '"')
+                boundary = boundary.substr(1, boundary.size() - 2);
+            m_boundary = boundary;
         }
     }
     else if (strncasecmp(text, "Host:", 5) == 0)
@@ -1507,8 +1564,6 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
 
     };
 
-
-
     if (m_method != POST)
 
         return fail("&#x5f53;&#x524d;&#x8bf7;&#x6c42;&#x65b9;&#x6cd5;&#x4e0d;&#x652f;&#x6301;&#x4e0a;&#x4f20;&#x3002;");
@@ -1518,43 +1573,116 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return fail("&#x672a;&#x68c0;&#x6d4b;&#x5230;&#x767b;&#x5f55;&#x7528;&#x6237;&#x3002;");
 
     if (!m_string || m_content_length <= 0)
-
         return fail("&#x672a;&#x68c0;&#x6d4b;&#x5230;&#x6709;&#x6548;&#x7684;&#x4e0a;&#x4f20;&#x5185;&#x5bb9;&#x3002;");
-
-
 
     const char *body_ptr = m_string;
     size_t body_len = static_cast<size_t>(m_content_length);
+    const char *body_end = body_ptr + body_len;
+
     auto find_seq = [](const char *hay, size_t hay_len, const char *needle, size_t needle_len) -> const char * {
         if (!hay || !needle || needle_len == 0 || hay_len < needle_len)
             return nullptr;
-        const char *end = hay + hay_len - needle_len + 1;
+        const char *end = hay + hay_len;
         const char *pos = std::search(hay, end, needle, needle + needle_len);
         if (pos == end)
             return nullptr;
         return pos;
     };
 
-    const char *line_end_ptr = find_seq(body_ptr, body_len, "\r\n", 2);
+    auto find_line_end = [&](const char *start_ptr, size_t len, size_t &line_len) -> const char * {
+        const char *crlf = find_seq(start_ptr, len, "\r\n", 2);
+        if (crlf)
+        {
+            line_len = 2;
+            return crlf;
+        }
+        const char *lf = find_seq(start_ptr, len, "\n", 1);
+        if (lf)
+        {
+            line_len = 1;
+            return lf;
+        }
+        return nullptr;
+    };
 
-    if (!line_end_ptr)
+    auto find_header_end = [&](const char *start_ptr, size_t len, size_t &sep_len) -> const char * {
+        const char *crlf = find_seq(start_ptr, len, "\r\n\r\n", 4);
+        if (crlf)
+        {
+            sep_len = 4;
+            return crlf;
+        }
+        const char *lf = find_seq(start_ptr, len, "\n\n", 2);
+        if (lf)
+        {
+            sep_len = 2;
+            return lf;
+        }
+        return nullptr;
+    };
 
+    auto find_boundary_line = [&](const std::string &delim) -> const char * {
+        if (delim.empty())
+            return nullptr;
+        if (body_len >= delim.size() && std::equal(body_ptr, body_ptr + delim.size(), delim.begin()))
+            return body_ptr;
+        std::string marker = "\r\n" + delim;
+        const char *pos = find_seq(body_ptr, body_len, marker.data(), marker.size());
+        if (pos)
+            return pos + 2;
+        marker = "\n" + delim;
+        pos = find_seq(body_ptr, body_len, marker.data(), marker.size());
+        if (pos)
+            return pos + 1;
+        return nullptr;
+    };
+
+    std::string boundary = m_boundary;
+    if (!boundary.empty() && boundary.rfind("--", 0) != 0)
+        boundary = "--" + boundary;
+
+    size_t boundary_break_len = 0;
+    bool boundary_break_known = false;
+
+    const char *boundary_ptr = find_boundary_line(boundary);
+    if (!boundary_ptr)
+    {
+        size_t line_len = 0;
+        const char *line_end_ptr = find_line_end(body_ptr, body_len, line_len);
+        if (!line_end_ptr)
+            return fail("&#x4e0a;&#x4f20;&#x6570;&#x636e;&#x683c;&#x5f0f;&#x4e0d;&#x5b8c;&#x6574;&#x3002;");
+        boundary.assign(body_ptr, static_cast<size_t>(line_end_ptr - body_ptr));
+        if (boundary.empty())
+            return fail("&#x7f3a;&#x5c11;&#x5206;&#x9694;&#x7b26;&#x3002;");
+        boundary_ptr = body_ptr;
+        boundary_break_len = line_len;
+        boundary_break_known = true;
+    }
+
+    const char *after_boundary = boundary_ptr + boundary.size();
+    if (boundary_break_known)
+    {
+        if (after_boundary + boundary_break_len > body_end)
+            return fail("&#x4e0a;&#x4f20;&#x6570;&#x636e;&#x683c;&#x5f0f;&#x4e0d;&#x5b8c;&#x6574;&#x3002;");
+    }
+    else if (after_boundary + 1 <= body_end && after_boundary[0] == '\r' && after_boundary[1] == '\n')
+    {
+        boundary_break_len = 2;
+    }
+    else if (after_boundary < body_end && after_boundary[0] == '\n')
+    {
+        boundary_break_len = 1;
+    }
+    else
+    {
         return fail("&#x4e0a;&#x4f20;&#x6570;&#x636e;&#x683c;&#x5f0f;&#x4e0d;&#x5b8c;&#x6574;&#x3002;");
-
-
-    size_t line_end = static_cast<size_t>(line_end_ptr - body_ptr);
-    std::string boundary(body_ptr, line_end);
-
-    if (boundary.empty())
-
-        return fail("&#x7f3a;&#x5c11;&#x5206;&#x9694;&#x7b26;&#x3002;");
-
-
-    const char *headers_start_ptr = line_end_ptr + 2;
-    if (headers_start_ptr > body_ptr + body_len)
+    }
+    const char *headers_start_ptr = after_boundary + boundary_break_len;
+    if (headers_start_ptr > body_end)
         return fail("&#x4e0a;&#x4f20;&#x5934;&#x90e8;&#x89e3;&#x6790;&#x5931;&#x8d25;&#x3002;");
-    size_t headers_remaining = body_len - static_cast<size_t>(headers_start_ptr - body_ptr);
-    const char *headers_end_ptr = find_seq(headers_start_ptr, headers_remaining, "\r\n\r\n", 4);
+    size_t headers_remaining = static_cast<size_t>(body_end - headers_start_ptr);
+    size_t header_sep_len = 0;
+    const char *headers_end_ptr = find_header_end(headers_start_ptr, headers_remaining, header_sep_len);
 
     if (!headers_end_ptr)
 
@@ -1563,35 +1691,60 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
 
     const char *headers_ptr = headers_start_ptr;
     size_t headers_len = static_cast<size_t>(headers_end_ptr - headers_ptr);
-    const char *filename_key = "filename=\"";
-    const char *filename_ptr = find_seq(headers_ptr, headers_len, filename_key, 10);
+    std::string headers(headers_ptr, headers_len);
 
-    if (!filename_ptr)
+    size_t filename_pos = headers.find("filename=\"");
+
+    if (filename_pos == std::string::npos)
 
         return fail("&#x6ca1;&#x6709;&#x627e;&#x5230;&#x4e0a;&#x4f20;&#x6587;&#x4ef6;&#x540d;&#x3002;");
 
-    const char *filename_val = filename_ptr + 10;
-    const char *filename_end_ptr = std::find(filename_val, headers_ptr + headers_len, '"');
+    filename_pos += 10;
 
-    if (filename_end_ptr == headers_ptr + headers_len)
+    size_t filename_end = headers.find('"', filename_pos);
+
+    if (filename_end == std::string::npos)
 
         return fail("&#x4e0a;&#x4f20;&#x6587;&#x4ef6;&#x540d;&#x89e3;&#x6790;&#x5931;&#x8d25;&#x3002;");
 
 
-    std::string original_name = sanitize_filename(std::string(filename_val, filename_end_ptr - filename_val));
+    std::string original_name = sanitize_filename(headers.substr(filename_pos, filename_end - filename_pos));
 
     if (original_name.empty())
 
         return fail("&#x4e0a;&#x4f20;&#x6587;&#x4ef6;&#x540d;&#x4e3a;&#x7a7a;&#x3002;");
 
 
-    const char *data_start_ptr = headers_end_ptr + 4;
-    if (data_start_ptr > body_ptr + body_len)
+    const char *data_start_ptr = headers_end_ptr + header_sep_len;
+    if (data_start_ptr > body_end)
         return fail("&#x4e0a;&#x4f20;&#x5185;&#x5bb9;&#x622a;&#x65ad;&#x3002;");
-    size_t data_start = static_cast<size_t>(data_start_ptr - body_ptr);
-    size_t data_remaining = body_len - data_start;
-    std::string boundary_marker = "\r\n" + boundary;
+    size_t data_remaining = static_cast<size_t>(body_end - data_start_ptr);
+    
+    LOG_INFO("Upload parse: boundary='%s' (len=%zu), data_remaining=%zu", 
+             boundary.c_str(), boundary.size(), data_remaining);
+    
+    // 查找结束boundary - 注意结束boundary可能是 boundary-- 或 boundary
+    // 先尝试找 boundary-- 形式（最后一个part的结束标记）
+    std::string end_boundary = boundary + "--";
+    std::string boundary_marker = "\r\n" + end_boundary;
+    
     const char *data_end_ptr = find_seq(data_start_ptr, data_remaining, boundary_marker.data(), boundary_marker.size());
+    if (!data_end_ptr)
+    {
+        std::string boundary_marker_lf = "\n" + end_boundary;
+        data_end_ptr = find_seq(data_start_ptr, data_remaining, boundary_marker_lf.data(), boundary_marker_lf.size());
+    }
+    // 如果还没找到，尝试不带 -- 的普通 boundary（多part场景下）
+    if (!data_end_ptr)
+    {
+        boundary_marker = "\r\n" + boundary;
+        data_end_ptr = find_seq(data_start_ptr, data_remaining, boundary_marker.data(), boundary_marker.size());
+    }
+    if (!data_end_ptr)
+    {
+        std::string boundary_marker_lf = "\n" + boundary;
+        data_end_ptr = find_seq(data_start_ptr, data_remaining, boundary_marker_lf.data(), boundary_marker_lf.size());
+    }
 
     if (!data_end_ptr || data_end_ptr <= data_start_ptr)
 
@@ -1639,7 +1792,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return fail("&#x65e0;&#x6cd5;&#x5199;&#x5165;&#x4e0a;&#x4f20;&#x6587;&#x4ef6;&#x3002;");
 
 
-    const char *file_data = body_ptr + data_start;
+    const char *file_data = data_start_ptr;
 
     size_t written_total = 0;
 
