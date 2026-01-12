@@ -131,7 +131,7 @@ public:
     /**
      * @brief 处理一次HTTP请求
      */
-    void process();
+    bool process();  // 返回 true 表示请求处理完成，false 表示需要更多数据
     /**
      * @brief 读取数据到缓冲区
      * @return 是否读取成功

@@ -11,4 +11,5 @@ if ! command -v cloudflared >/dev/null 2>&1; then
   exit 1
 fi
 
-cloudflared tunnel --url "http://localhost:${PORT}" "$@"
+# 使用 http2 协议替代 quic，避免某些网络环境下 UDP 被阻止
+cloudflared tunnel --url "http://localhost:${PORT}" --protocol http2 "$@"

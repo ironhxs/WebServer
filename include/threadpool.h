@@ -331,14 +331,23 @@ void threadpool<T>::run()
             {
                 if (request->read_once())
                 {
-                    request->improv = 1;
                     connectionRAII mysqlcon(&request->mysql, m_connPool);
-                    request->process();
+                    bool completed = request->process();
+                    if (completed)
+                    {
+                        request->improv = 1;  // 请求完成，通知主线程
+                    }
+                    // 如果 !completed，不设置 improv，等待下一次 EPOLLIN
+                    // 但主线程会超时退出，然后 epoll 会再次触发
+                    else
+                    {
+                        request->improv = 1;  // 仍然设为1让主线程继续，等待下一次事件
+                    }
                 }
                 else
                 {
-                    request->improv = 1;
                     request->timer_flag = 1;
+                    request->improv = 1;
                 }
             }
             else
@@ -349,8 +358,8 @@ void threadpool<T>::run()
                 }
                 else
                 {
-                    request->improv = 1;
                     request->timer_flag = 1;
+                    request->improv = 1;
                 }
             }
         }

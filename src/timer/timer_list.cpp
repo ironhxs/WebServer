@@ -295,13 +295,24 @@ int *Utils::u_pipefd = 0;
 int Utils::u_epollfd = 0;
 
 /**
- * @brief 定时器回调函数
+ * @brief 定时器回调函数 - 超时关闭连接
  * @param user_data 连接关联数据
+ * @details 定时器超时时调用，负责清理连接并更新统计信息
  */
 void cb_func(client_data *user_data)
 {
-    epoll_ctl(Utils::u_epollfd, EPOLL_CTL_DEL, user_data->sockfd, 0);
     assert(user_data);
-    close(user_data->sockfd);
-    http_conn::m_user_count--;
+    
+    // 如果有关联的 http_conn 对象，调用其 close_conn() 来正确更新IP统计
+    if (user_data->conn)
+    {
+        user_data->conn->close_conn(true);
+    }
+    else
+    {
+        // 降级处理：直接关闭（旧代码逻辑）
+        epoll_ctl(Utils::u_epollfd, EPOLL_CTL_DEL, user_data->sockfd, 0);
+        close(user_data->sockfd);
+        http_conn::m_user_count--;
+    }
 }

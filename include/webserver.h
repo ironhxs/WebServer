@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <cassert>
 #include <sys/epoll.h>
+#include <ifaddrs.h>
+#include <netdb.h>
 
 #include "threadpool.h"
 #include "http_connection.h"
@@ -25,7 +27,8 @@
 // ========== 全局常量定义 ==========
 const int MAX_FD = 10000;           ///< 系统最大文件描述符数量
 const int MAX_EVENT_NUMBER = 10000; ///< epoll可监听的最大事件数
-const int TIMESLOT = 60;            ///< 定时器最小超时单位（秒），大文件上传总超时 3*60=180秒
+const int TIMESLOT = 10;            ///< 定时器最小超时单位（秒），连接总超时 3*30=90秒
+                                     ///< 建议值：开发环境20秒，生产环境30-60秒
 
 /**
  * @class WebServer

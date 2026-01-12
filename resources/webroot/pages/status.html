@@ -26,7 +26,9 @@
     <p style="color: var(--muted); margin-top: 10px;">实时查看服务运行状态与统计信息。</p>
     <div class="grid" style="margin-top: 18px;">
         <div class="card"><h3>运行时长</h3><p id="uptime">-</p></div>
-        <div class="card"><h3>在线连接</h3><p id="online">-</p></div>
+        <div class="card"><h3>在线用户</h3><p id="online-users">-</p></div>
+        <div class="card"><h3>活跃连接</h3><p id="online-connections">-</p></div>
+        <div class="card"><h3>累计访客</h3><p id="total-visitors">-</p></div>
         <div class="card"><h3>请求总数</h3><p id="total">-</p></div>
         <div class="card"><h3>平均 QPS</h3><p id="qps">-</p></div>
         <div class="card"><h3>服务器时间</h3><p id="time">-</p></div>
@@ -44,7 +46,12 @@ const updateStatus = () => {
         const m = Math.floor((sec % 3600) / 60);
         const s = sec % 60;
         document.getElementById('uptime').textContent = `${h}h ${m}m ${s}s`;
-        document.getElementById('online').textContent = data.online_connections;
+        // 在线用户 = 唯一IP数量（考虑了Cloudflare穿透）
+        document.getElementById('online-users').textContent = data.online_users || 0;
+        // 活跃连接 = TCP连接数
+        document.getElementById('online-connections').textContent = data.online_connections || 0;
+        // 累计访客 = 历史唯一IP总数
+        document.getElementById('total-visitors').textContent = data.total_unique_visitors || 0;
         document.getElementById('total').textContent = data.total_requests;
         const qps = typeof data.avg_qps === 'number' ? data.avg_qps : 0;
         document.getElementById('qps').textContent = qps.toFixed(2);

@@ -33,6 +33,9 @@
 
 class util_timer;
 
+// 前向声明
+class http_conn;
+
 /**
  * @struct client_data
  * @brief 连接对应的数据结构（与定时器关联）
@@ -42,6 +45,7 @@ struct client_data
     sockaddr_in address; ///< 客户端地址信息
     int sockfd;          ///< 连接的文件描述符
     util_timer *timer;   ///< 关联的定时器指针
+    http_conn *conn;     ///< 关联的http_conn对象指针
 };
 
 /**

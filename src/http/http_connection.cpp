@@ -915,27 +915,41 @@ bool http_conn::read_once()
     if (0 == m_TRIGMode)
     {
         // LT模式也需要循环读取，直到EAGAIN或读完
+        long total_read = 0;
         while (true)
         {
             if (m_read_idx >= static_cast<long>(m_read_buf.size()))
             {
                 if (!grow_read_buffer())
+                {
+                    LOG_ERROR("LT read: grow_read_buffer failed, m_read_idx=%ld", m_read_idx);
                     return false;
+                }
             }
             bytes_read = recv(m_sockfd, m_read_buf.data() + m_read_idx,
                               static_cast<int>(m_read_buf.size() - m_read_idx), 0);
             if (bytes_read < 0)
             {
                 if (errno == EAGAIN || errno == EWOULDBLOCK)
+                {
+                    LOG_INFO("LT read: EAGAIN, total_read=%ld, m_read_idx=%ld", total_read, m_read_idx);
                     break;  // 数据暂时读完，返回成功
+                }
                 if (errno == EINTR)
                     continue;  // 被信号中断，继续读
+                LOG_ERROR("LT read: recv error, errno=%d", errno);
                 return false;  // 真正的错误
             }
             if (bytes_read == 0)
+            {
+                LOG_INFO("LT read: connection closed by peer, total_read=%ld", total_read);
                 return false;  // 连接关闭
+            }
             m_read_idx += bytes_read;
+            total_read += bytes_read;
         }
+        LOG_INFO("LT read success: total_read=%ld, m_read_idx=%ld, content_length=%ld", 
+                 total_read, m_read_idx, m_content_length);
         return true;
     }
 
@@ -1235,8 +1249,12 @@ http_conn::HTTP_CODE http_conn::parse_headers(char *text)
 http_conn::HTTP_CODE http_conn::parse_content(char *text)
 
 {
-
-    if (m_read_idx >= (m_content_length + m_checked_idx))
+    // 检查是否收到了完整的请求体
+    // m_start_line 是请求体的起始位置（头部结束后）
+    // m_content_length 是请求体的长度
+    // m_read_idx 是已读取的总字节数
+    long needed = m_start_line + m_content_length;
+    if (m_read_idx >= needed)
 
     {
 
@@ -1265,6 +1283,17 @@ http_conn::HTTP_CODE http_conn::process_read()
     char *text = 0;
 
 
+
+    // 处理请求体时的特殊逻辑：不需要逐行解析
+    if (m_check_state == CHECK_STATE_CONTENT && m_content_length > 0)
+    {
+        // 直接检查是否收到了完整的请求体
+        char *text = m_read_buf.data() + m_start_line;
+        HTTP_CODE ret = parse_content(text);
+        if (ret == GET_REQUEST)
+            return do_request();
+        return NO_REQUEST;  // 还需要更多数据
+    }
 
     while ((m_check_state == CHECK_STATE_CONTENT && line_status == LINE_OK) || ((line_status = parse_line()) == LINE_OK))
 
@@ -1456,10 +1485,20 @@ http_conn::HTTP_CODE http_conn::handle_status_json()
     char time_buf[32] = "-";
     std::strftime(time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", &tm_snapshot);
 
+    // 统计在线用户数（唯一IP数量，已考虑Cloudflare穿透）
+    size_t online_users = 0;
+    size_t total_unique_ips = 0;
+    m_ip_lock.lock();
+    online_users = m_ip_counts.size();      // 当前在线的唯一IP数
+    total_unique_ips = m_unique_ips.size(); // 历史所有唯一IP数
+    m_ip_lock.unlock();
+
     std::ostringstream oss;
     oss << "{" 
         << "\"uptime_seconds\":" << uptime << ","
+        << "\"online_users\":" << online_users << ","
         << "\"online_connections\":" << m_user_count << ","
+        << "\"total_unique_visitors\":" << total_unique_ips << ","
         << "\"total_requests\":" << total << ","
         << "\"avg_qps\":" << std::fixed << std::setprecision(2) << qps << ","
         << "\"server_time\":\"" << time_buf << "\""
@@ -1788,32 +1827,21 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
     int fd = open(file_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
     if (fd < 0)
-
         return fail("&#x65e0;&#x6cd5;&#x5199;&#x5165;&#x4e0a;&#x4f20;&#x6587;&#x4ef6;&#x3002;");
 
-
     const char *file_data = data_start_ptr;
-
     size_t written_total = 0;
 
     while (written_total < file_size)
-
     {
-
         ssize_t written = ::write(fd, file_data + written_total, file_size - written_total);
-
         if (written <= 0)
-
         {
-
             close(fd);
-
+            unlink(file_path.c_str());  // 删除不完整的文件
             return fail("&#x5199;&#x5165;&#x6587;&#x4ef6;&#x5931;&#x8d25;&#x3002;");
-
         }
-
         written_total += static_cast<size_t>(written);
-
     }
 
     close(fd);
@@ -3444,11 +3472,13 @@ bool http_conn::process_write(HTTP_CODE ret)
 
 
 
-void http_conn::process()
+bool http_conn::process()
 
 {
 
     HTTP_CODE read_ret = process_read();
+    LOG_INFO("process: process_read returned %d, m_read_idx=%ld, m_content_length=%ld, m_checked_idx=%ld, m_start_line=%ld", 
+             read_ret, m_read_idx, m_content_length, m_checked_idx, m_start_line);
 
     if (read_ret == NO_REQUEST)
 
@@ -3456,7 +3486,7 @@ void http_conn::process()
 
         modfd(m_epollfd, m_sockfd, EPOLLIN, m_TRIGMode);
 
-        return;
+        return false;  // 需要更多数据
 
     }
 
@@ -3469,9 +3499,11 @@ void http_conn::process()
     {
 
         close_conn();
+        return true;  // 处理完成（虽然是失败的）
 
     }
 
     modfd(m_epollfd, m_sockfd, EPOLLOUT, m_TRIGMode);
+    return true;  // 处理完成
 
 }
