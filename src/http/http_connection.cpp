@@ -655,7 +655,7 @@ void http_conn::close_conn(bool real_close)
 {
     if (real_close && (m_sockfd != -1))
     {
-        printf("close %d\n", m_sockfd);
+        // printf("close %d\n", m_sockfd);  // Debug output removed for performance
         if (!m_ip.empty())
         {
             m_ip_lock.lock();

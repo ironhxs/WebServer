@@ -48,8 +48,8 @@ class http_conn
 {
 public:
     static const int FILENAME_LEN = 200;               ///< 文件名最大长度
-    static const int READ_BUFFER_SIZE = 10 * 1024 * 1024;  ///< 读缓冲区大小（10MB）
-    static const int WRITE_BUFFER_SIZE = 8 * 1024;     ///< 写缓冲区大小
+    static const int READ_BUFFER_SIZE = 16384;         ///< 读缓冲区大小（16KB）
+    static const int WRITE_BUFFER_SIZE = 16384;        ///< 写缓冲区大小（16KB）
     /**
      * @brief HTTP方法枚举
      */

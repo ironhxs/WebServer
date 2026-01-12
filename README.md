@@ -122,7 +122,7 @@ WebServer/
 ./bin/webserver -p 9006 -l 0 -t 4
 
 # 🚀 高性能模式
-./bin/webserver -p 80 -l 1 -m 3 -t 16 -a 0
+./bin/webserver -p 9006 -l 1 -m 3 -t 16 -a 0
 
 # 📈 压力测试模式
 ./bin/webserver -p 9006 -l 1 -m 3 -c 1 -t 32
@@ -132,11 +132,20 @@ WebServer/
 
 ## 📊 性能测试
 
-使用 Webbench 压力测试：
+### 使用 Webbench
 
 ```bash
-# 编译并运行测试
-./scripts/run_webbench.sh http://localhost:9006/ 10000 10
+# 10000 并发，10 秒
+./scripts/run_webbench.sh http://localhost:9006/ 1000 30
+```
+
+### 使用 wrk
+
+```bash
+# 安装: cd /tmp && git clone https://gitee.com/mirrors/wrk.git && cd wrk && make && sudo cp wrk /usr/local/bin/
+
+# 测试：8 线程，1000 连接
+wrk -t8 -c1000 -d30s http://localhost:9006/
 ```
 
 ### 测试结果

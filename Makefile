@@ -18,11 +18,11 @@ TARGET := $(BIN_DIR)/$(PROJECT_NAME)
 
 # Compiler
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra -I$(INC_DIR)
+CXXFLAGS := -std=c++11 -Wall -Wextra -Wno-unused-parameter -I$(INC_DIR)
 LDFLAGS := -lpthread -lmysqlclient
 
 # Build mode
-DEBUG ?= 1
+DEBUG ?= 0
 ifeq ($(DEBUG), 1)
     CXXFLAGS += -g -O0 -DDEBUG
     BUILD_MODE := DEBUG

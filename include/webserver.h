@@ -27,8 +27,7 @@
 // ========== 全局常量定义 ==========
 const int MAX_FD = 10000;           ///< 系统最大文件描述符数量
 const int MAX_EVENT_NUMBER = 10000; ///< epoll可监听的最大事件数
-const int TIMESLOT = 10;            ///< 定时器最小超时单位（秒），连接总超时 3*30=90秒
-                                     ///< 建议值：开发环境20秒，生产环境30-60秒
+const int TIMESLOT = 5;             ///< 定时器最小超时单位（秒），每5秒检查一次超时
 
 /**
  * @class WebServer

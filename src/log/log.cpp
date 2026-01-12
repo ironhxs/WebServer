@@ -133,9 +133,9 @@ void Log::write_log(int level, const char *format, ...)
         char new_log[512] = {0};
         fflush(m_fp);
         fclose(m_fp);
-        char tail[16] = {0};
+        char tail[32] = {0};
 
-        snprintf(tail, 16, "%d_%02d_%02d_", my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday);
+        snprintf(tail, 32, "%d_%02d_%02d_", my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday);
 
         if (m_today != my_tm.tm_mday)
         {

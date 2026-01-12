@@ -245,10 +245,12 @@ void Utils::addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
  */
 void Utils::sig_handler(int sig)
 {
-    int save_errno = errno; // 保存原来的 errno
+    int save_errno = errno;
     int msg = sig;
-    send(u_pipefd[1], (char *)&msg, 1, 0); // 将信号写入管道
-    errno = save_errno; // 恢复 errno
+    if (u_pipefd != nullptr) {
+        send(u_pipefd[1], (char *)&msg, 1, 0);
+    }
+    errno = save_errno;
 }
 
 /**
@@ -265,7 +267,10 @@ void Utils::addsig(int sig, void(handler)(int), bool restart)
     if (restart)
         sa.sa_flags |= SA_RESTART;
     sigfillset(&sa.sa_mask);
-    assert(sigaction(sig, &sa, NULL) != -1);
+    if (sigaction(sig, &sa, NULL) == -1) {
+        perror("sigaction failed");
+        exit(1);
+    }
 }
 
 /**
@@ -291,7 +296,7 @@ void Utils::show_error(int connfd, const char *info)
 /**
  * @brief 静态成员初始化
  */
-int *Utils::u_pipefd = 0;
+int *Utils::u_pipefd = nullptr;
 int Utils::u_epollfd = 0;
 
 /**
