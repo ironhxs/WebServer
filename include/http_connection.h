@@ -36,7 +36,7 @@ class http_conn
 {
 public:
     static const int FILENAME_LEN = 200;
-    static const int READ_BUFFER_SIZE = 64 * 1024;
+    static const int READ_BUFFER_SIZE = 256 * 1024;
     static const int WRITE_BUFFER_SIZE = 8 * 1024;
     enum METHOD
     {
