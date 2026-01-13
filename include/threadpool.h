@@ -23,7 +23,7 @@
  *   * 适用：计算密集型应用
  * 
  * @tparam T 任务类型（通常为http_conn）
- * @author Your Name
+ * @author ironhxs
  * @date 2026-01-09
  * @version 2.0
  */
@@ -337,8 +337,6 @@ void threadpool<T>::run()
                     {
                         request->improv = 1;  // 请求完成，通知主线程
                     }
-                    // 如果 !completed，不设置 improv，等待下一次 EPOLLIN
-                    // 但主线程会超时退出，然后 epoll 会再次触发
                     else
                     {
                         request->improv = 1;  // 仍然设为1让主线程继续，等待下一次事件

@@ -133,8 +133,8 @@ public:
      */
     bool process();  // 返回 true 表示请求处理完成，false 表示需要更多数据
     /**
-     * @brief 读取数据到缓冲区
-     * @return 是否读取成功
+     * @brief 从socket读取数据到缓冲区
+     * @return 读取成功返回true，失败或对端关闭返回false
      */
     bool read_once();
     /**
@@ -155,7 +155,7 @@ public:
      * @param connPool 连接池指针
      */
     void initmysql_result(connection_pool *connPool);
-    int timer_flag; ///< 计时器触发标记
+    int timer_flag; ///< 超时/关闭标志（工作线程置位，主线程处理定时器关闭）
     int improv;     ///< 处理完成标记
     /**
      * @brief 执行PHP脚本
@@ -229,14 +229,6 @@ private:
      */
     bool user_owns_upload(const std::string &owner, const std::string &stored_name) const;
     /**
-     * @brief 处理用户图库页
-     */
-    HTTP_CODE handle_user_gallery_page();
-    /**
-     * @brief 处理用户视频页
-     */
-    HTTP_CODE handle_user_video_page();
-    /**
      * @brief 更新客户端IP
      */
     void update_client_ip(const std::string &ip);
@@ -302,7 +294,11 @@ public:
     static std::atomic<long long> m_total_requests; ///< 总请求数
     static time_t m_start_time; ///< 统计起始时间
     MYSQL *mysql; ///< 当前连接使用的数据库指针
-    int m_state;  ///< 当前读写状态（0=读，1=写）
+    /**
+     * @brief 当前事件状态（Reactor模式下使用）
+     * @details 0 表示读事件，1 表示写事件。
+     */
+    int m_state;
 
 private:
     int m_sockfd;                 ///< 连接fd

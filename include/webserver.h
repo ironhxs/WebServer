@@ -188,7 +188,7 @@ public:
      * @details 用于保存每个连接的地址、sockfd及定时器指针，
      *          便于超时回调快速定位并关闭连接。
      */
-    client_data *users_timer;
+    client_data *users_timer;    ///< （client_data）：负责超时管理（保存地址、fd、定时器指针）
     Utils utils;                 ///< 工具类对象
 };
 #endif
