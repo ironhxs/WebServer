@@ -228,10 +228,7 @@ desktop.ini
 *_backup
 *_old
 
-# 核心转储文件
-core
-core.*
-*.core
+
 
 # 性能分析文件
 *.prof
@@ -246,5 +243,7 @@ cachegrind.out.*
 docs/html/
 docs/latex/
 Doxyfile.bak
-
+*.deb
+!src/core/
+!src/core/**
 # ==============================================================================
