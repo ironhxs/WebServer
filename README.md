@@ -135,7 +135,7 @@ WebServer/
 ### 使用 Webbench
 
 ```bash
-# 10000 并发，10 秒
+# 1000 并发，30 秒
 ./scripts/run_webbench.sh http://localhost:9006/ 1000 30
 ```
 

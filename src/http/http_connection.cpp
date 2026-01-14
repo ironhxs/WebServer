@@ -2163,6 +2163,7 @@ http_conn::HTTP_CODE http_conn::handle_welcome_page()
 http_conn::HTTP_CODE http_conn::handle_upload_request()
 
 {
+    // 统一错误出口：构建失败页并返回动态响应
     // 失败响应的lambda函数
     auto fail = [&](const std::string &message) {
 
@@ -2196,6 +2197,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return DYNAMIC_REQUEST;
 
     };
+    // 1) 校验请求合法性：方法/登录态/请求体
     // 验证请求方法
     if (m_method != POST)
 
@@ -2208,6 +2210,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
     if (!m_string || m_content_length <= 0)
         return fail("&#x672a;&#x68c0;&#x6d4b;&#x5230;&#x6709;&#x6548;&#x7684;&#x4e0a;&#x4f20;&#x5185;&#x5bb9;&#x3002;");
 
+    // 2) 准备解析 multipart/form-data 数据
     // 请求体指针和长度
     const char *body_ptr = m_string;
     size_t body_len = static_cast<size_t>(m_content_length);
@@ -2224,6 +2227,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return pos;
     };
 
+    // 逐行定位：处理 CRLF 和 LF 两种换行
     auto find_line_end = [&](const char *start_ptr, size_t len, size_t &line_len) -> const char * {
         const char *crlf = find_seq(start_ptr, len, "\r\n", 2);
         if (crlf)
@@ -2240,6 +2244,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return nullptr;
     };
 
+    // 找到头部结束（空行）
     auto find_header_end = [&](const char *start_ptr, size_t len, size_t &sep_len) -> const char * {
         const char *crlf = find_seq(start_ptr, len, "\r\n\r\n", 4);
         if (crlf)
@@ -2256,6 +2261,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return nullptr;
     };
 
+    // 找到 multipart 边界行（支持首行或中间行）
     auto find_boundary_line = [&](const std::string &delim) -> const char * {
         if (delim.empty())
             return nullptr;
@@ -2272,6 +2278,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return nullptr;
     };
 
+    // 3) 解析 boundary 分隔符
     std::string boundary = m_boundary;
     if (!boundary.empty() && boundary.rfind("--", 0) != 0)
         boundary = "--" + boundary;
@@ -2294,6 +2301,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         boundary_break_known = true;
     }
 
+    // boundary 行后应紧跟 CRLF/LF
     const char *after_boundary = boundary_ptr + boundary.size();
     if (boundary_break_known)
     {
@@ -2312,6 +2320,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
     {
         return fail("&#x4e0a;&#x4f20;&#x6570;&#x636e;&#x683c;&#x5f0f;&#x4e0d;&#x5b8c;&#x6574;&#x3002;");
     }
+    // 4) 解析 part 头部，提取文件名
     const char *headers_start_ptr = after_boundary + boundary_break_len;
     if (headers_start_ptr > body_end)
         return fail("&#x4e0a;&#x4f20;&#x5934;&#x90e8;&#x89e3;&#x6790;&#x5931;&#x8d25;&#x3002;");
@@ -2343,6 +2352,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return fail("&#x4e0a;&#x4f20;&#x6587;&#x4ef6;&#x540d;&#x89e3;&#x6790;&#x5931;&#x8d25;&#x3002;");
 
 
+    // 清理文件名，避免路径穿越/非法字符
     std::string original_name = sanitize_filename(headers.substr(filename_pos, filename_end - filename_pos));
 
     if (original_name.empty())
@@ -2350,6 +2360,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return fail("&#x4e0a;&#x4f20;&#x6587;&#x4ef6;&#x540d;&#x4e3a;&#x7a7a;&#x3002;");
 
 
+    // 5) 定位二进制文件内容区间
     const char *data_start_ptr = headers_end_ptr + header_sep_len;
     if (data_start_ptr > body_end)
         return fail("&#x4e0a;&#x4f20;&#x5185;&#x5bb9;&#x622a;&#x65ad;&#x3002;");
@@ -2358,7 +2369,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
     LOG_INFO("Upload parse: boundary='%s' (len=%zu), data_remaining=%zu", 
              boundary.c_str(), boundary.size(), data_remaining);
     
-    // 查找结束boundary - 注意结束boundary可能是 boundary-- 或 boundary
+    // 查找结束 boundary：可能是 boundary--（最后一个part）或 boundary（中间part）
     // 先尝试找 boundary-- 形式（最后一个part的结束标记）
     std::string end_boundary = boundary + "--";
     std::string boundary_marker = "\r\n" + end_boundary;
@@ -2393,6 +2404,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
         return fail("&#x6587;&#x4ef6;&#x5185;&#x5bb9;&#x4e3a;&#x7a7a;&#x3002;");
 
 
+    // 6) 生成存储文件名：username + 时间戳 + 原文件名
     time_t now = time(nullptr);
 
     std::tm tm_snapshot{};
@@ -2413,12 +2425,14 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
     std::string stored_name = m_username + "_" + ts_buf + "_" + original_name;
     std::string upload_dir = std::string(doc_root) + "/uploads";
     std::string meta_dir = upload_dir + "/.meta";
+    // 确保上传目录和元数据目录存在
     if (mkdir(upload_dir.c_str(), 0755) == -1 && errno != EEXIST)
         return fail("&#x65e0;&#x6cd5;&#x521b;&#x5efa;&#x4e0a;&#x4f20;&#x76ee;&#x5f55;&#x3002;");
     if (mkdir(meta_dir.c_str(), 0755) == -1 && errno != EEXIST)
         return fail("&#x65e0;&#x6cd5;&#x521b;&#x5efa;&#x5143;&#x6570;&#x636e;&#x76ee;&#x5f55;&#x3002;");
 
 
+    // 7) 写入文件到磁盘
     std::string file_path = upload_dir + "/" + stored_name;
     int fd = open(file_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
@@ -2444,6 +2458,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
 
 
 
+    // 8) 记录元数据（用于个人上传列表）
     std::ofstream meta(meta_dir + "/" + m_username + ".list", std::ios::app);
 
     if (meta)
@@ -2452,6 +2467,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_request()
 
 
 
+    // 9) 构建成功页面（动态HTML）
     std::string file_url = "/uploads/" + stored_name;
 
     std::ostringstream body_html;
@@ -2609,6 +2625,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_list()
 http_conn::HTTP_CODE http_conn::handle_upload_delete()
 {
 
+    // 统一错误出口：构建失败页并返回动态响应
     auto fail = [&](const std::string &message, int status) {
 
         std::ostringstream body;
@@ -2643,6 +2660,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_delete()
 
     };
 
+    // 1) 校验请求合法性：方法/登录态/请求体
     if (m_method != POST)
 
         return fail("&#x5f53;&#x524d;&#x8bf7;&#x6c42;&#x65b9;&#x6cd5;&#x4e0d;&#x652f;&#x6301;&#x5220;&#x9664;&#x3002;", 400);
@@ -2655,21 +2673,26 @@ http_conn::HTTP_CODE http_conn::handle_upload_delete()
 
         return fail("&#x672a;&#x68c0;&#x6d4b;&#x5230;&#x6709;&#x6548;&#x7684;&#x5220;&#x9664;&#x8bf7;&#x6c42;&#x3002;", 400);
 
+    // 2) 从表单里取出待删除文件名
     std::string payload(m_string, static_cast<size_t>(m_content_length));
     std::string stored = get_form_value(payload, "file");
     if (stored.empty())
         stored = get_form_value(payload, "stored");
     if (stored.empty())
         return fail("&#x672a;&#x627e;&#x5230;&#x8981;&#x5220;&#x9664;&#x7684;&#x6587;&#x4ef6;&#x3002;", 400);
+    // 禁止目录穿越或非法路径
     if (stored.find("..") != std::string::npos || stored.find('/') != std::string::npos || stored.find('\\') != std::string::npos)
         return fail("&#x6587;&#x4ef6;&#x540d;&#x4e0d;&#x5408;&#x6cd5;&#x3002;", 400);
+    // 3) 权限校验：仅允许删除自己的文件
     if (!user_owns_upload(m_username, stored))
         return fail("&#x6ca1;&#x6709;&#x6743;&#x9650;&#x5220;&#x9664;&#x8be5;&#x6587;&#x4ef6;&#x3002;", 404);
 
+    // 4) 删除实际文件
     std::string file_path = std::string(doc_root) + "/uploads/" + stored;
     if (::remove(file_path.c_str()) != 0 && errno != ENOENT)
         return fail("&#x5220;&#x9664;&#x6587;&#x4ef6;&#x5931;&#x8d25;&#x3002;", 500);
 
+    // 5) 更新元数据列表（删除对应记录）
     std::string meta_path = std::string(doc_root) + "/uploads/.meta/" + m_username + ".list";
     std::ifstream in(meta_path);
     if (!in)
@@ -2705,6 +2728,7 @@ http_conn::HTTP_CODE http_conn::handle_upload_delete()
     if (::rename(tmp_path.c_str(), meta_path.c_str()) != 0)
         return fail("&#x66f4;&#x65b0;&#x8bb0;&#x5f55;&#x5931;&#x8d25;&#x3002;", 500);
 
+    // 6) 构建删除成功页面
     std::ostringstream body;
     body << R"HTML(<section class="panel" style="max-width: 620px; margin: 0 auto;">
 
